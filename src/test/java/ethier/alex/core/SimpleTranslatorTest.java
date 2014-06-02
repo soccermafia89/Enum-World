@@ -29,7 +29,8 @@ public class SimpleTranslatorTest {
     public void testTranslator() throws Exception {
         System.out.println("Running test.");                
         
-        SimpleTranslator translator = new SimpleTranslator();
+        int[] ordinals = {2,3,3};
+        SimpleTranslator translator = new SimpleTranslator(ordinals);
         translator.translateEnumWorld();
     }
     
