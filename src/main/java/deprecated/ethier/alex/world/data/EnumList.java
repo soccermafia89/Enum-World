@@ -1,3 +1,6 @@
+// This implementation won't work
+//package deprecated.ethier.alex.world.data;
+
 ///*
 // * To change this template, choose Tools | Templates
 // * and open the template in the editor.
