@@ -5,7 +5,7 @@
 package ethier.alex.world.helper;
 
 import ethier.alex.world.core.data.Matches;
-import ethier.alex.world.core.data.Ordinal;
+import ethier.alex.world.core.data.Numeral;
 
 /**
 
@@ -13,7 +13,7 @@ import ethier.alex.world.core.data.Ordinal;
  */
 public class Matcher {
     
-    public static Matches getMatch(Ordinal one, Ordinal two) {
+    public static Matches getMatch(Numeral one, Numeral two) {
         return null;
     }
 }

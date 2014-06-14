@@ -8,8 +8,11 @@ package ethier.alex.world.core.data;
 
  @author alex
  */
-public interface Ordinal {
+public interface Numeral {
+    
     public int getOrdinal();
     
-    public Enum getEnum();
+    public int getRadix();
+    
+    public Enum getState();
 }

@@ -9,5 +9,17 @@ package ethier.alex.world.core.data;
  @author alex
  */
 public enum FilterElementState {
-    ALL, ONE
+
+    ALL, ONE;
+    
+    private int comparator;
+
+    static {
+        ALL.comparator = 2;
+        ONE.comparator = 3;
+    }
+
+    public int comparator() {
+        return comparator;
+    }
 }

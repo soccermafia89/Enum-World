@@ -8,27 +8,36 @@ package ethier.alex.world.core.data;
 
  @author alex
  */
-public class FilterElement implements Ordinal {
+
+public class FilterElement implements Numeral {
     
     private FilterElementState filterElementState;
-    private Enum filter;
+    private int ordinal; // The ordinal value.
+    private int radix; // Total number of possible ordinals.
     
-    public FilterElement(FilterElementState myFilterElementState, Enum myFilter) {
-        filterElementState = myFilterElementState;
-        filter = myFilter;
+    public FilterElement(int myRadix, int myOrdinal, FilterElementState myElementState) {
+        filterElementState = myElementState;
+        radix = myRadix;
+        ordinal = myOrdinal;
+    }    
+    
+    @Override
+    public int getOrdinal() {
+        return ordinal;
     }
     
-    public FilterElementState getFilterElementState() {
+    @Override
+    public Enum getState() {
         return filterElementState;
     }
     
     @Override
-    public int getOrdinal() {
-        return filter.ordinal();
+    public int getRadix() {
+        return radix;
     }
-
+    
     @Override
-    public Enum getEnum() {
-        return filter;
+    public String toString() {
+        return "" + ordinal;
     }
 }
