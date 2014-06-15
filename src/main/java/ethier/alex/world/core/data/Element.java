@@ -4,50 +4,60 @@
  */
 package ethier.alex.world.core.data;
 
+import org.apache.log4j.Logger;
+
 /**
 
  @author alex
  */
-
 public class Element implements Numeral {
-    
+
+    private static Logger logger = Logger.getLogger(Element.class);
     private ElementState elementState;
     private int ordinal; // The ordinal value.
     private int radix; // Total number of possible ordinals.
-    
-    public Element(int myRadix, ElementState myElementState) {
-        if(myElementState == ElementState.ALL) {
-            elementState = ElementState.ALL;
-            int radix = myRadix;
-            // The ordinal doesn't matter if the element state is 'ALL' 
-        } else {
-            throw new RuntimeException("Can only construct Element(ElementState elementState) if the state is 'ALL'.");
+
+    public Element(int myRadix, Enum myElementState) {
+        if (myElementState == ElementState.SET) {
+            throw new RuntimeException("Must use constructor with ordinal of elementState == 'SET'");
         }
+
+        elementState = (ElementState)myElementState;
+        radix = myRadix;
+        // The ordinal doesn't matter if the element state is 'ALL' 
     }
-    
-    public Element(int myRadix, int myOrdinal, ElementState myElementState) {
-        elementState = myElementState;
+
+    public Element(int myRadix, int myOrdinal) {
+        elementState = ElementState.SET;
         radix = myRadix;
         ordinal = myOrdinal;
-    }    
-    
+    }
+
     @Override
     public int getOrdinal() {
         return ordinal;
     }
-    
+
     @Override
     public Enum getState() {
         return elementState;
     }
-    
+
     @Override
     public int getRadix() {
         return radix;
     }
-    
+
     @Override
     public String toString() {
-        return "" + ordinal;
+        if(elementState == ElementState.ALL) {
+            return "*";
+        } else if(elementState == ElementState.UNSET) {
+            return "-";
+        } else if(elementState == ElementState.SET) {
+            return "" + ordinal;
+        }
+            
+        throw new RuntimeException("Invalid state reached.");
     }
 }

@@ -7,12 +7,15 @@ package ethier.alex.world.core.data;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import org.apache.log4j.Logger;
 
 /**
 
  @author alex
  */
 public class Partition {
+    
+    private static Logger logger = Logger.getLogger(Partition.class);
 
     NumeralArray elements;
     Collection<NumeralArray> filters;
@@ -51,8 +54,8 @@ public class Partition {
         
         for(int i=0;i < radix;i++) {
             NumeralArray newSplit = elements.copy();
-            Element newElement = new Element(elementSplit.getRadix(), i, ElementState.SET);
-            newSplit.set(i, newElement);
+            Element newElement = new Element(elementSplit.getRadix(), i);
+            newSplit.set(splitIndex, newElement);
             
             elementSplits[i] = newSplit;
         }
@@ -61,6 +64,8 @@ public class Partition {
     }
 
     public boolean hasSplit() {
+        logger.info("elements: " + elements.toString());
+        
         if (splitIndex > -1) {
             return true;
         } else {
@@ -71,10 +76,10 @@ public class Partition {
     public String printElements() {
         StringBuilder stringBuilder = new StringBuilder();
         
-        Iterator<Element> it = elements.iterator();
+        Iterator<Numeral> it = elements.iterator();
         while(it.hasNext()) {
-            Element element = it.next();
-            stringBuilder.append(element.toString());
+            Numeral numeral = it.next();
+            stringBuilder.append(numeral.toString());
         }
         
         return stringBuilder.toString();

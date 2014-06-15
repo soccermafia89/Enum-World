@@ -64,13 +64,13 @@ public class SimpleProcessor {
     }
     
     public Collection<Partition> splitPartition(Partition partition) {
-        logger.debug("Splitting partition with combination: " + partition.printElements());
+        logger.debug("Splitting partition with combination: " + partition.printElements() + " with split index: " + partition.getSplitIndex());
         
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         
         NumeralArray combination = partition.getElements();
         
-        NumeralArray[] combinationSplits = partition.getSplits();
+        
 
 //        BitList zeroList = bitLists[0];
 //        BitList oneList = bitLists[1];
@@ -83,6 +83,9 @@ public class SimpleProcessor {
         int radix = combination.get(splitIndex).getRadix();
         
         Collection<NumeralArray>[] filterSplits = new Collection[radix];
+        for(int i=0; i < filterSplits.length;i++) {
+            filterSplits[i] = new ArrayList<NumeralArray>();
+        }
 
         boolean allBothFilters = true;
         for(NumeralArray filter : filters) {
@@ -117,37 +120,31 @@ public class SimpleProcessor {
 
         // In the special case that all filters contain a '*' then we don't need to return multiple splits.
         if(allBothFilters) {
+            
             Numeral numeral = combination.get(splitIndex);
             Element allElement = new Element(numeral.getRadix(), ElementState.ALL);
-            combinationSplits[0].set(splitIndex, allElement);
+            partition.getElements().set(splitIndex, allElement);
 
-            Partition bothPartition = new Partition(combinationSplits[0], filterSplits[0]);
+            Partition allPartition = new Partition(partition.getElements(), filterSplits[0]);
             
-            if(!matchExists(bothPartition)) {
-                newPartitions.add(bothPartition);
+            if(!matchExists(allPartition)) {
+                newPartitions.add(allPartition);
             }
 
         } else {
+            NumeralArray[] combinationSplits = partition.getSplits();
             
             for(int i=0;i < filterSplits.length;i++) {
                 Collection<NumeralArray> filterCollection = filterSplits[i];
                 NumeralArray splitCombination = combinationSplits[i];
                 Partition splitPartition = new Partition(splitCombination, filterCollection);
                 
+                logger.info("New partition made: " + splitPartition.printElements());
+                
                 if(!matchExists(splitPartition)) {
                     newPartitions.add(splitPartition);
                 }
             }
-//            Partition zeroPartition = new Partition(zeroList, zeroFilters);
-//            Partition onePartition = new Partition(oneList, oneFilters);
-//            
-//            if(!matchExists(zeroPartition)) {
-//                newPartitions.add(zeroPartition);
-//            }
-//            
-//            if(!matchExists(onePartition)) {
-//                newPartitions.add(onePartition);
-//            }
         }
         
         for(Partition newPartition : newPartitions) {
@@ -162,6 +159,14 @@ public class SimpleProcessor {
     }
     
     private boolean matchExists(Partition partition) {
+        
+        if(partition == null) {
+            logger.error("Passed in partition is null!");
+        }
+        
+        if(partition.getFilters() == null) {
+            logger.error("Partiton filters is null!");
+        }
         
         NumeralArray combination = partition.getElements();
         

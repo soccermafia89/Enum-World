@@ -11,11 +11,21 @@ package ethier.alex.world.core.data;
 
 public class FilterElement implements Numeral {
     
-    private FilterElementState filterElementState;
+    private Enum filterElementState;
     private int ordinal; // The ordinal value.
     private int radix; // Total number of possible ordinals.
     
-    public FilterElement(int myRadix, int myOrdinal, FilterElementState myElementState) {
+    public FilterElement(int myRadix, int myOrdinal) {
+        radix = myRadix;
+        ordinal = myOrdinal;
+        if(myOrdinal < 0) {
+            filterElementState = FilterElementState.ALL;
+        } else {
+            filterElementState = FilterElementState.ONE;
+        }
+    }
+    
+    public FilterElement(int myRadix, int myOrdinal, Enum myElementState) {
         filterElementState = myElementState;
         radix = myRadix;
         ordinal = myOrdinal;

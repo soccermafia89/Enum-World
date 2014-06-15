@@ -38,7 +38,7 @@ public class NumeralArray implements Iterable {
     }
 
     @Override
-    public Iterator<Element> iterator() {
+    public Iterator<Numeral> iterator() {
         return new NumeralArrayIterator(numeralArray);
     }
 
@@ -69,10 +69,10 @@ public class NumeralArray implements Iterable {
             if (secondState instanceof ElementState) {
                 secondAll = ElementState.ALL;
                 secondUnset = ElementState.UNSET;
-            } else if (firstState instanceof FilterElementState) {
+            } else if (secondState instanceof FilterElementState) {
                 secondAll = FilterElementState.ALL;
             } else {
-                throw new RuntimeException("Invalid match enum passed: " + firstState);
+                throw new RuntimeException("Invalid match enum passed: " + secondState);
             }
 
             //Order of if statements matters!
@@ -102,5 +102,9 @@ public class NumeralArray implements Iterable {
         } else {
             return Matches.ENTIRELY;
         }
+    }
+    
+    public String toString() {
+        return Arrays.toString(numeralArray);
     }
 }
