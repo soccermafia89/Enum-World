@@ -69,17 +69,9 @@ public class SimpleProcessor {
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         
         NumeralArray combination = partition.getElements();
-        
-        
-
-//        BitList zeroList = bitLists[0];
-//        BitList oneList = bitLists[1];
-
         Collection<NumeralArray> filters = partition.getFilters();
         int splitIndex = partition.getSplitIndex();
         
-//        Collection<BitList> zeroFilters = new ArrayList<BitList>();
-//        Collection<BitList> oneFilters = new ArrayList<BitList>();
         int radix = combination.get(splitIndex).getRadix();
         
         Collection<NumeralArray>[] filterSplits = new Collection[radix];
@@ -105,20 +97,10 @@ public class SimpleProcessor {
             } else {
                 throw new RuntimeException("Invalid state, filterBit: " + filterBit + " should have correct FilterElementState.");
             }
-            
-//            if(filterBit == Bit.BOTH) {
-//                zeroFilters.add(filter);
-//                oneFilters.add(filter);
-//            } else if(filterBit == Bit.ZERO) {
-//                zeroFilters.add(filter);
-//                allBothFilters = false;
-//            } else if(filterBit == Bit.ONE) {
-//                oneFilters.add(filter);
-//                allBothFilters = false;
-//            }
         }
 
         // In the special case that all filters contain a '*' then we don't need to return multiple splits.
+        // This is the key to computing quickly.
         if(allBothFilters) {
             
             Numeral numeral = combination.get(splitIndex);
