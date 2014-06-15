@@ -6,6 +6,7 @@ package ethier.alex.world.core.data;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import org.apache.log4j.Logger;
 
 /**
 
@@ -14,6 +15,8 @@ import java.util.Iterator;
 // Wraps an Numeral[] as a class
 public class NumeralArray implements Iterable {
 
+    private static Logger logger = Logger.getLogger(NumeralArray.class);
+    
     private Numeral[] numeralArray;
 
     public NumeralArray(Numeral[] myNumeralArray) {
@@ -43,10 +46,23 @@ public class NumeralArray implements Iterable {
     }
 
     public Matches getMatch(NumeralArray second, int splitIndex) {
+        
+        //TODO: Instead of constantly retesting for matching, save the match results within each filter.
+        //Only retest matching on split indexes.
+        int start;
+        if(splitIndex == -1) {
+            start = 0;
+        } else {
+            start = splitIndex;
+        }
 
         boolean possibleMatch = false;
 
-        for (int i = splitIndex; i < numeralArray.length; i++) {
+        for (int i = start; i < numeralArray.length; i++) {
+            
+            logger.info("SPLIT INDEX DURING MATCH: " + splitIndex);
+            logger.info("MATCHING WITH NUMERAL ARRAY: " + (new NumeralArray(numeralArray)).toString());
+            
             Numeral firstNumeral = numeralArray[i];
             Numeral secondNumeral = second.get(i);
 

@@ -44,14 +44,33 @@ public class SimpleProcessorTest {
         System.out.println("");
         System.out.println(""); 
         
-        int[] radices = new int[3];
+        int[] radices = new int[4];
         radices[0] = 3;
         radices[1] = 2;
-        radices[2] = 2;
+        radices[2] = 3;
+        radices[3] = 2;
         
         NumeralArray filter1 = NumeralArrayBuilder.newInstance()
                 .setRadices(radices)
-                .setOrdinals(new int[] {0, -1, -1})
+                .setOrdinals(new int[] {0, -1, -1, -1})
+                .setAsFilter()
+                .getNumeralArray();
+        
+        NumeralArray filter2 = NumeralArrayBuilder.newInstance()
+                .setRadices(radices)
+                .setOrdinals(new int[] {-1, -1, 1, -1})
+                .setAsFilter()
+                .getNumeralArray();
+        
+        NumeralArray filter3 = NumeralArrayBuilder.newInstance()
+                .setRadices(radices)
+                .setOrdinals(new int[] {-1, -1, 0, -1})
+                .setAsFilter()
+                .getNumeralArray();
+        
+        NumeralArray filter4 = NumeralArrayBuilder.newInstance()
+                .setRadices(radices)
+                .setOrdinals(new int[] {1, 1, 2, 0})
                 .setAsFilter()
                 .getNumeralArray();
         
@@ -59,6 +78,9 @@ public class SimpleProcessorTest {
                 .newInstance()
                 .setRadices(radices)
                 .addFilter(filter1)
+                .addFilter(filter2)
+                .addFilter(filter3)
+                .addFilter(filter4)
                 .getPartition();
         
         SimpleProcessor simpleProcessor = new SimpleProcessor(rootPartition);
@@ -69,32 +91,6 @@ public class SimpleProcessorTest {
         for(NumeralArray finalPartition : finalPartitions) {
             System.out.println("Final partition computed: " + finalPartition.toString());
         }
-        
-//        BitList combination = BitListBuilder.buildBitList("---");
-//        BitList filter1 = BitListBuilder.buildBitList("1**");
-//        BitList filter2 = BitListBuilder.buildBitList("*11");
-////        BitList filter3 = BitListBuilder.buildBitList("**01*");
-//        
-//        Collection<BitList> filters = new ArrayList<BitList>();
-//        filters.add(filter1);
-//        filters.add(filter2);
-////        filters.add(filter3);
-//        
-//        
-//        Partition partition = new Partition(combination, filters);
-//        Collection<Partition> partitions = new ArrayList<Partition>();
-//        partitions.add(partition);
-//        
-//        SimpleProcessor simpleProcessor = new SimpleProcessor(partitions);
-//        
-//        simpleProcessor.runAll();
-//        Collection<BitList> finalCombinations = simpleProcessor.getCompletedPartitions();
-//        
-//        for(BitList finalCombination : finalCombinations) {
-//            logger.info("Combination found: " + finalCombination.toString());
-//        }
-//        
-//        logger.error("TODO: make proper assertions in test cases.");
         
         Assert.assertTrue(true);
     }
