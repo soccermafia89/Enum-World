@@ -151,7 +151,7 @@ public class SimpleProcessor {
         ElementList combination = partition.getElements();
         
         for(FilterList filter : partition.getFilters()) {
-            Matches matchOutcome = combination.getMatch(filter, partition.getSplitIndex());
+            Matches matchOutcome = filter.applyMatch(combination);
             
             if(matchOutcome == Matches.ENTIRELY) {
                 return true;

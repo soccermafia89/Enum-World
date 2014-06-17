@@ -4,8 +4,7 @@
  */
 package ethier.alex.world.core.data;
 
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -13,22 +12,32 @@ import org.apache.log4j.Logger;
  @author alex
  */
 // Wraps an Numeral[] as a class
-public class FilterList implements Iterable {
+public class FilterList {
 
     private static Logger logger = Logger.getLogger(FilterList.class);
-    private Filter[] filterElements;
+    private Set<Integer> unmatchedFilterIndex;
+    private Filter[] filters;
+//    private Filter[] filterElements;
 
     public FilterList(Filter[] myFilterElements) {
-        filterElements = myFilterElements;
+        unmatchedFilterIndex = new HashSet<Integer>();
+
+        for (int i = 0; i < myFilterElements.length; i++) {
+            if (myFilterElements[i].getFilterState() != FilterState.ALL) {
+                unmatchedFilterIndex.add(i);
+            }
+        }
+
+        filters = myFilterElements;
     }
 
     public int getLength() {
-        return filterElements.length;
+        return filters.length;
     }
 
     public int[] getOrdinals() {
-        int[] ordinals = new int[filterElements.length];
-        for (int i = 0; i < filterElements.length; i++) {
+        int[] ordinals = new int[filters.length];
+        for (int i = 0; i < filters.length; i++) {
             ordinals[i] = this.getFilter(i).getOrdinal();
         }
 
@@ -36,81 +45,100 @@ public class FilterList implements Iterable {
     }
 
     public FilterState[] getFilterStates() {
-        FilterState[] filterStates = new FilterState[filterElements.length];
-        for (int i = 0; i < filterElements.length; i++) {
+        FilterState[] filterStates = new FilterState[filters.length];
+        for (int i = 0; i < filters.length; i++) {
             filterStates[i] = this.getFilter(i).getFilterState();
         }
-        
+
         return filterStates;
     }
 
     public Filter getFilter(int i) {
-        return filterElements[i];
+        return filters[i];
     }
 
-    public FilterList copy() {
-        Filter[] newFilterElementArray = Arrays.copyOf(filterElements, filterElements.length);
-        return new FilterList(newFilterElementArray);
-    }
+    public Matches applyMatch(ElementList elementList) {
 
-    public void set(int i, Filter filterElement) {
-        filterElements[i] = filterElement;
+        boolean possibleMatch = false;
+
+//        for (int i = start; i < filters.length; i++) {
+        Iterator<Integer> it = unmatchedFilterIndex.iterator();
+        while(it.hasNext()) {
+            
+            int i = it.next();
+
+            ElementState elementState = elementList.getElement(i).getElementState();
+
+            //Order of if statements matters!
+            //1) If either has a Both then they match
+            //2) If 1 is false, and the element is UNSET it is now a part match.
+            //3) If the bits match, then they still match.
+            //4) Otherwise they completely don't match.
+            if (elementState == ElementState.ALL) {
+                continue;
+            } else if (elementState == ElementState.UNSET) {
+                possibleMatch = true; // No longer a match, only a possible match.
+            } else {
+                int firstOrdinal = this.getFilter(i).getOrdinal();
+                int secondOrdinal = elementList.getElement(i).getOrdinal();
+
+                if (firstOrdinal == secondOrdinal) {
+                    it.remove();
+                    continue;
+                } else {
+                    return Matches.NO;
+                }
+
+            }
+        }
+
+        if (possibleMatch) {
+            return Matches.PARTLY;
+        } else {
+            return Matches.ENTIRELY;
+        }
+    }
+    
+    public Matches checkMatch(ElementList elementList) {
+
+        boolean possibleMatch = false;
+
+//        for (int i = start; i < filters.length; i++) {
+        for (int i : unmatchedFilterIndex) {
+
+            ElementState elementState = elementList.getElement(i).getElementState();
+
+            //Order of if statements matters!
+            //1) If either has a Both then they match
+            //2) If 1 is false, and the element is UNSET it is now a part match.
+            //3) If the bits match, then they still match.
+            //4) Otherwise they completely don't match.
+            if (elementState == ElementState.ALL) {
+                continue;
+            } else if (elementState == ElementState.UNSET) {
+                possibleMatch = true; // No longer a match, only a possible match.
+            } else {
+                int firstOrdinal = this.getFilter(i).getOrdinal();
+                int secondOrdinal = elementList.getElement(i).getOrdinal();
+
+                if (firstOrdinal == secondOrdinal) {
+                    continue;
+                } else {
+                    return Matches.NO;
+                }
+
+            }
+        }
+
+        if (possibleMatch) {
+            return Matches.PARTLY;
+        } else {
+            return Matches.ENTIRELY;
+        }
     }
 
     @Override
-    public Iterator<Filter> iterator() {
-        return new NumeralArrayIterator(filterElements);
-    }
-
-//    public Matches getMatch(ElementList elementList, int splitIndex) {
-//
-//        //TODO: Instead of constantly retesting for matching, save the match results within each filter.
-//        //Only retest matching on split indexes.
-//        int start;
-//        if (splitIndex == -1) {
-//            start = 0;
-//        } else {
-//            start = splitIndex;
-//        }
-//
-//        boolean possibleMatch = false;
-//
-//        for (int i = start; i < filterElements.length; i++) {
-//            
-//            FilterElementState filterElementState = filterElements[i].getFilterState();
-//            ElementState elementState = elementList.getElement(i).getElementState();
-//
-//
-//            //Order of if statements matters!
-//            //1) If either has a Both then they match
-//            //2) If 1 is false, and the element is UNSET it is now a part match.
-//            //3) If the bits match, then they still match.
-//            //4) Otherwise they completely don't match.
-//            if (filterElementState == FilterElementState.ALL || elementState == ElementState.ALL) {
-//                continue;
-//            } else if (elementState == ElementState.UNSET) {
-//                possibleMatch = true; // No longer a match, only a possible match.
-//            } else {
-//                int firstOrdinal = this.getFilter(i).getOrdinal();
-//                int secondOrdinal = elementList.getElement(i).getOrdinal();
-//
-//                if (firstOrdinal == secondOrdinal) {
-//                    continue;
-//                } else {
-//                    return Matches.NO;
-//                }
-//
-//            }
-//        }
-//
-//        if (possibleMatch) {
-//            return Matches.PARTLY;
-//        } else {
-//            return Matches.ENTIRELY;
-//        }
-//    }
-
     public String toString() {
-        return Arrays.toString(filterElements);
+        return Arrays.toString(filters);
     }
 }

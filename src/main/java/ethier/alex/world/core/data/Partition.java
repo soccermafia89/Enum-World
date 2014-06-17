@@ -92,7 +92,7 @@ public class Partition {
     
     public boolean verifyIntegrity() {
         for(FilterList filter : filters) {
-            if(elements.getMatch(filter, splitIndex) != Matches.PARTLY) {
+            if(filter.checkMatch(elements) != Matches.PARTLY) {
                 return false;
             }
         }

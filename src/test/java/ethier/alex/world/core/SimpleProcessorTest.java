@@ -5,12 +5,14 @@
 package ethier.alex.world.core;
 
 import com.google.common.base.Stopwatch;
-import ethier.alex.world.addon.ElementListBuilder;
 import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math.util.MathUtils;

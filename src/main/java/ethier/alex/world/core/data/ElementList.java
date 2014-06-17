@@ -62,54 +62,6 @@ public class ElementList implements Iterable {
         return new NumeralArrayIterator(elementArray);
     }
     
-    public Matches getMatch(FilterList filterList, int splitIndex) {
-
-        //TODO: Instead of constantly retesting for matching, save the match results within each filter.
-        //Only retest matching on split indexes.
-        int start;
-        if (splitIndex == -1) {
-            start = 0;
-        } else {
-            start = splitIndex;
-        }
-
-        boolean possibleMatch = false;
-
-        for (int i = start; i < elementArray.length; i++) {
-            
-            FilterState filterElementState = filterList.getFilter(i).getFilterState();
-            ElementState elementState = this.getElement(i).getElementState();
-
-
-            //Order of if statements matters!
-            //1) If either has a Both then they match
-            //2) If 1 is false, and the element is UNSET it is now a part match.
-            //3) If the bits match, then they still match.
-            //4) Otherwise they completely don't match.
-            if (filterElementState == FilterState.ALL || elementState == ElementState.ALL) {
-                continue;
-            } else if (elementState == ElementState.UNSET) {
-                possibleMatch = true; // No longer a match, only a possible match.
-            } else {
-                int firstOrdinal = this.getElement(i).getOrdinal();
-                int secondOrdinal = filterList.getFilter(i).getOrdinal();
-
-                if (firstOrdinal == secondOrdinal) {
-                    continue;
-                } else {
-                    return Matches.NO;
-                }
-
-            }
-        }
-
-        if (possibleMatch) {
-            return Matches.PARTLY;
-        } else {
-            return Matches.ENTIRELY;
-        }
-    }
-
 //    public Matches getMatch(FilterList filterList, int splitIndex) {
 //
 //        //TODO: Instead of constantly retesting for matching, save the match results within each filter.
@@ -124,47 +76,23 @@ public class ElementList implements Iterable {
 //        boolean possibleMatch = false;
 //
 //        for (int i = start; i < elementArray.length; i++) {
+//            
+//            FilterState filterElementState = filterList.getFilter(i).getFilterState();
+//            ElementState elementState = this.getElement(i).getElementState();
 //
-//            Numeral firstNumeral = elementArray[i];
-//            Numeral secondNumeral = filterList.getFilter(i);
-//
-//            Enum firstState = firstNumeral.getState();
-//            Enum secondState = secondNumeral.getState();
-//
-//            Enum firstAll;
-//            Enum firstUnset = null;
-//            if (firstState instanceof ElementState) {
-//                firstAll = ElementState.ALL;
-//                firstUnset = ElementState.UNSET;
-//            } else if (firstState instanceof FilterElementState) {
-//                firstAll = FilterElementState.ALL;
-//            } else {
-//                throw new RuntimeException("Invalid match enum passed: " + firstState);
-//            }
-//
-//            Enum secondAll;
-//            Enum secondUnset = null;
-//            if (secondState instanceof ElementState) {
-//                secondAll = ElementState.ALL;
-//                secondUnset = ElementState.UNSET;
-//            } else if (secondState instanceof FilterElementState) {
-//                secondAll = FilterElementState.ALL;
-//            } else {
-//                throw new RuntimeException("Invalid match enum passed: " + secondState);
-//            }
 //
 //            //Order of if statements matters!
 //            //1) If either has a Both then they match
-//            //2) If 1 is false, and either has an UNSET it is now a part match.
+//            //2) If 1 is false, and the element is UNSET it is now a part match.
 //            //3) If the bits match, then they still match.
 //            //4) Otherwise they completely don't match.
-//            if (firstState == firstAll || secondState == secondAll) {
+//            if (filterElementState == FilterState.ALL || elementState == ElementState.ALL) {
 //                continue;
-//            } else if (firstState == firstUnset || secondState == secondUnset) {
+//            } else if (elementState == ElementState.UNSET) {
 //                possibleMatch = true; // No longer a match, only a possible match.
 //            } else {
-//                int firstOrdinal = firstNumeral.getOrdinal();
-//                int secondOrdinal = secondNumeral.getOrdinal();
+//                int firstOrdinal = this.getElement(i).getOrdinal();
+//                int secondOrdinal = filterList.getFilter(i).getOrdinal();
 //
 //                if (firstOrdinal == secondOrdinal) {
 //                    continue;
@@ -182,6 +110,7 @@ public class ElementList implements Iterable {
 //        }
 //    }
 
+    @Override
     public String toString() {
         return Arrays.toString(elementArray);
     }
