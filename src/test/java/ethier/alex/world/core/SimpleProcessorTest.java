@@ -5,12 +5,10 @@
 package ethier.alex.world.core;
 
 import com.google.common.base.Stopwatch;
-import ethier.alex.world.addon.NumeralArrayBuilder;
+import ethier.alex.world.addon.ElementListBuilder;
+import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
-import ethier.alex.world.core.data.ElementState;
-import ethier.alex.world.core.data.FilterElementState;
-import ethier.alex.world.core.data.NumeralArray;
-import ethier.alex.world.core.data.Partition;
+import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -36,63 +34,59 @@ public class SimpleProcessorTest {
         BasicConfigurator.configure();
     }
     
-//    @Test
-//    public void testProcessor() throws Exception {
-//        System.out.println("");
-//        System.out.println("");
-//        System.out.println("********************************************");
-//        System.out.println("********         Basic Test        *********");
-//        System.out.println("********************************************");
-//        System.out.println("");
-//        System.out.println(""); 
-//        
-//        int[] radices = new int[4];
-//        radices[0] = 3;
-//        radices[1] = 2;
-//        radices[2] = 3;
-//        radices[3] = 2;
-//        
-//        NumeralArray filter1 = NumeralArrayBuilder.newInstance()
-//                .setOrdinals(new int[] {0, -1, -1, -1})
-//                .setAsFilter()
-//                .getNumeralArray();
-//        
-//        NumeralArray filter2 = NumeralArrayBuilder.newInstance()
-//                .setOrdinals(new int[] {-1, -1, 1, -1})
-//                .setAsFilter()
-//                .getNumeralArray();
-//        
-//        NumeralArray filter3 = NumeralArrayBuilder.newInstance()
-//                .setOrdinals(new int[] {-1, -1, 0, -1})
-//                .setAsFilter()
-//                .getNumeralArray();
-//        
-//        NumeralArray filter4 = NumeralArrayBuilder.newInstance()
-//                .setOrdinals(new int[] {1, 1, 2, 0})
-//                .setAsFilter()
-//                .getNumeralArray();
-//        
-//        Partition rootPartition = PartitionBuilder
-//                .newInstance()
-//                .setBlankWorld()
-//                .setRadices(radices)
-//                .addFilter(filter1)
-//                .addFilter(filter2)
-//                .addFilter(filter3)
-//                .addFilter(filter4)
-//                .getPartition();
-//        
-//        SimpleProcessor simpleProcessor = new SimpleProcessor(rootPartition);
-//        
-//        simpleProcessor.runAll();
-//        
-//        Collection<NumeralArray> finalPartitions = simpleProcessor.getCompletedPartitions();
-//        for(NumeralArray finalPartition : finalPartitions) {
-//            System.out.println("Final partition computed: " + finalPartition.toString());
-//        }
-//        
-//        Assert.assertTrue(true);
-//    }
+    @Test
+    public void testProcessor() throws Exception {
+        System.out.println("");
+        System.out.println("");
+        System.out.println("********************************************");
+        System.out.println("********         Basic Test        *********");
+        System.out.println("********************************************");
+        System.out.println("");
+        System.out.println(""); 
+        
+        int[] radices = new int[4];
+        radices[0] = 3;
+        radices[1] = 2;
+        radices[2] = 3;
+        radices[3] = 2;
+        
+        FilterList filter1 = FilterListBuilder.newInstance()
+                .setOrdinals(new int[] {0, -1, -1, -1})
+                .getFilterList();
+        
+        FilterList filter2 = FilterListBuilder.newInstance()
+                .setOrdinals(new int[] {-1, -1, 1, -1})
+                .getFilterList();
+        
+        FilterList filter3 = FilterListBuilder.newInstance()
+                .setOrdinals(new int[] {-1, -1, 0, -1})
+                .getFilterList();
+        
+        FilterList filter4 = FilterListBuilder.newInstance()
+                .setOrdinals(new int[] {1, 1, 2, 0})
+                .getFilterList();
+        
+        Partition rootPartition = PartitionBuilder
+                .newInstance()
+                .setBlankWorld()
+                .setRadices(radices)
+                .addFilter(filter1)
+                .addFilter(filter2)
+                .addFilter(filter3)
+                .addFilter(filter4)
+                .getPartition();
+        
+        SimpleProcessor simpleProcessor = new SimpleProcessor(rootPartition);
+        
+        simpleProcessor.runAll();
+        
+        Collection<ElementList> finalElements = simpleProcessor.getCompletedPartitions();
+        for(ElementList finalElement : finalElements) {
+            System.out.println("Final partition computed: " + finalElement.toString());
+        }
+        
+        Assert.assertTrue(true);
+    }
     
     @Test
     public void testComplements() throws Exception {
@@ -116,7 +110,7 @@ public class SimpleProcessorTest {
             int ones = 3;
             int worldLength = 8;
 
-            Collection<NumeralArray> filters = new ArrayList<NumeralArray>();
+            Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
 
             String breakStr = "";
@@ -136,10 +130,9 @@ public class SimpleProcessorTest {
                     filterStr = StringUtils.leftPad(filterStr, worldLength, '0');
                     int combOnes = StringUtils.countMatches(filterStr, "1");
                     if (combOnes == ones) {
-//                        BitList filter = BitListBuilder.buildBitList(filterStr);
-                        NumeralArray filter = NumeralArrayBuilder.newInstance()
-                                .setAsFilter(filterStr)
-                                .getNumeralArray();
+                        FilterList filter = FilterListBuilder.newInstance()
+                                .setQuick(filterStr)
+                                .getFilterList();
                                 
                         logger.debug("Adding filter: " + filter);
                         filters.add(filter);
@@ -159,10 +152,10 @@ public class SimpleProcessorTest {
             Stopwatch stopWatch =  Stopwatch.createStarted();
             processor.runAll();
             stopWatch.stop();
-            Collection<NumeralArray> resultCombinations = processor.getCompletedPartitions();
+            Collection<ElementList> resultCombinations = processor.getCompletedPartitions();
 
-            Collection<NumeralArray> complementFilters = new ArrayList<NumeralArray>();
-            for(NumeralArray resultCombination : resultCombinations) {
+            Collection<FilterList> complementFilters = new ArrayList<FilterList>();
+            for(ElementList resultCombination : resultCombinations) {
                 logger.debug(resultCombination);
                 int[] resultOrdinals = resultCombination.getOrdinals();
                 
@@ -178,11 +171,10 @@ public class SimpleProcessorTest {
                     }                    
                 }
                                 
-                NumeralArray complementFilter = NumeralArrayBuilder.newInstance()
-                        .setAsFilter()
+                FilterList complementFilter = FilterListBuilder.newInstance()
                         .setOrdinals(resultOrdinals)
-                        .setStates(complementFilterStates)
-                        .getNumeralArray();
+                        .setFilterStates(complementFilterStates)
+                        .getFilterList();
                                 
                 complementFilters.add(complementFilter);                            
             }
@@ -197,10 +189,10 @@ public class SimpleProcessorTest {
             stopWatch.start();
             processor.runAll();
             stopWatch.stop();
-            Collection<NumeralArray> originalCombinations = processor.getCompletedPartitions();
+            Collection<ElementList> originalCombinations = processor.getCompletedPartitions();
 
             Set<String> outputSet = new HashSet<String>();
-            for(NumeralArray origList : originalCombinations) {
+            for(ElementList origList : originalCombinations) {
                 logger.debug(origList);
                 
                 String enumStr = origList.toString();

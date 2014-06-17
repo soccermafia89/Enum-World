@@ -35,8 +35,7 @@ public class Element implements Numeral {
         return ordinal;
     }
 
-    @Override
-    public Enum getState() {
+    public ElementState getElementState() {
         return elementState;
     }
 

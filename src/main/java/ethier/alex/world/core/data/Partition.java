@@ -17,20 +17,20 @@ public class Partition {
     
     private static Logger logger = Logger.getLogger(Partition.class);
 
-    NumeralArray elements;
-    Collection<NumeralArray> filters;
+    ElementList elements;
+    Collection<FilterList> filters;
     private int splitIndex = -1;
     private int[] radices;
 
-    public Partition(int[] myRadices, NumeralArray myElements, Collection<NumeralArray> myFilters) {
+    public Partition(int[] myRadices, ElementList myElements, Collection<FilterList> myFilters) {
         elements = myElements;
         filters = myFilters;
         radices = myRadices;
 
         for (int i = 0; i < elements.getLength(); i++) {
 
-            Numeral element = elements.get(i);
-            if (splitIndex < 0 && element.getState() == ElementState.UNSET) {
+            Element element = elements.getElement(i);
+            if (splitIndex < 0 && element.getElementState() == ElementState.UNSET) {
                 splitIndex = i;
             }
         }
@@ -40,11 +40,11 @@ public class Partition {
         return radices;
     }
     
-    public Collection<NumeralArray> getFilters() {
+    public Collection<FilterList> getFilters() {
         return filters;
     }
 
-    public NumeralArray getElements() {
+    public ElementList getElements() {
         return elements;
     }
     
@@ -52,13 +52,13 @@ public class Partition {
         return splitIndex;
     }
     
-    public NumeralArray[] getSplits() {
+    public ElementList[] getSplits() {
         int radix = radices[splitIndex];
         
-        NumeralArray[] elementSplits = new NumeralArray[radix];
+        ElementList[] elementSplits = new ElementList[radix];
         
         for(int i=0;i < radix;i++) {
-            NumeralArray newSplit = elements.copy();
+            ElementList newSplit = elements.copy();
             Element newElement = new Element(i);
             newSplit.set(splitIndex, newElement);
             
@@ -81,7 +81,7 @@ public class Partition {
     public String printElements() {
         StringBuilder stringBuilder = new StringBuilder();
         
-        Iterator<Numeral> it = elements.iterator();
+        Iterator<Element> it = elements.iterator();
         while(it.hasNext()) {
             Numeral numeral = it.next();
             stringBuilder.append(numeral.toString());
@@ -91,7 +91,7 @@ public class Partition {
     }
     
     public boolean verifyIntegrity() {
-        for(NumeralArray filter : filters) {
+        for(FilterList filter : filters) {
             if(elements.getMatch(filter, splitIndex) != Matches.PARTLY) {
                 return false;
             }

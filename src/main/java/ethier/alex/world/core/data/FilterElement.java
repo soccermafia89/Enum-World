@@ -42,8 +42,7 @@ public class FilterElement implements Numeral {
         return ordinal;
     }
     
-    @Override
-    public Enum getState() {
+    public FilterElementState getFilterState() {
         return filterElementState;
     }
     

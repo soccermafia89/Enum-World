@@ -19,20 +19,20 @@ public class SimpleProcessor {
     private static Logger logger = Logger.getLogger(SimpleProcessor.class);
     
     private Collection<Partition> incompletePartitions;
-    private Collection<NumeralArray> finalCombinations;
+    private Collection<ElementList> finalCombinations;
     
     public SimpleProcessor(Partition myPartition) {
         incompletePartitions = new ArrayList<Partition>();
         incompletePartitions.add(myPartition);
-        finalCombinations = new ArrayList<NumeralArray>();
+        finalCombinations = new ArrayList<ElementList>();
     }
     
     public SimpleProcessor(Collection<Partition> myPartitions) {
         incompletePartitions = myPartitions;
-        finalCombinations = new ArrayList<NumeralArray>();   
+        finalCombinations = new ArrayList<ElementList>();   
     }
     
-    public Collection<NumeralArray> getCompletedPartitions() {
+    public Collection<ElementList> getCompletedPartitions() {
         return finalCombinations;
     }
     
@@ -68,34 +68,33 @@ public class SimpleProcessor {
         
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         
-        NumeralArray combination = partition.getElements();
-        Collection<NumeralArray> filters = partition.getFilters();
+        Collection<FilterList> filters = partition.getFilters();
         int splitIndex = partition.getSplitIndex();
         
         int radix = partition.getRadices()[splitIndex];
         
-        Collection<NumeralArray>[] filterSplits = new Collection[radix];
+        Collection<FilterList>[] filterSplits = new Collection[radix];
         for(int i=0; i < filterSplits.length;i++) {
-            filterSplits[i] = new ArrayList<NumeralArray>();
+            filterSplits[i] = new ArrayList<FilterList>();
         }
 
         boolean allBothFilters = true;
-        for(NumeralArray filter : filters) {
-            Numeral filterBit = filter.get(splitIndex);
+        for(FilterList filter : filters) {
+            FilterElement filterElement = filter.getFilter(splitIndex);
             
-            if(filterBit.getState() == FilterElementState.ALL) {
+            if(filterElement.getFilterState() == FilterElementState.ALL) {
                 
-                for(Collection<NumeralArray> filterSplit : filterSplits) {
+                for(Collection<FilterList> filterSplit : filterSplits) {
                     filterSplit.add(filter);
                 }
                 
-            } else if(filterBit.getState() == FilterElementState.ONE) {
-                int ordinal = filterBit.getOrdinal();
+            } else if(filterElement.getFilterState() == FilterElementState.ONE) {
+                int ordinal = filterElement.getOrdinal();
                 filterSplits[ordinal].add(filter);
                 
                 allBothFilters = false;
             } else {
-                throw new RuntimeException("Invalid state, filterBit: " + filterBit + " should have correct FilterElementState.");
+                throw new RuntimeException("Invalid state, filterBit: " + filterElement + " should have correct FilterElementState.");
             }
         }
 
@@ -113,11 +112,11 @@ public class SimpleProcessor {
             }
 
         } else {
-            NumeralArray[] combinationSplits = partition.getSplits();
+            ElementList[] combinationSplits = partition.getSplits();
             
             for(int i=0;i < filterSplits.length;i++) {
-                Collection<NumeralArray> filterCollection = filterSplits[i];
-                NumeralArray splitCombination = combinationSplits[i];
+                Collection<FilterList> filterCollection = filterSplits[i];
+                ElementList splitCombination = combinationSplits[i];
                 Partition splitPartition = new Partition(partition.getRadices(), splitCombination, filterCollection);
                 
                 logger.info("New partition made: " + splitPartition.printElements());
@@ -149,9 +148,9 @@ public class SimpleProcessor {
             logger.error("Partiton filters is null!");
         }
         
-        NumeralArray combination = partition.getElements();
+        ElementList combination = partition.getElements();
         
-        for(NumeralArray filter : partition.getFilters()) {
+        for(FilterList filter : partition.getFilters()) {
             Matches matchOutcome = combination.getMatch(filter, partition.getSplitIndex());
             
             if(matchOutcome == Matches.ENTIRELY) {

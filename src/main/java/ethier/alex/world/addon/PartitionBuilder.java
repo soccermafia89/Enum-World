@@ -4,7 +4,8 @@
  */
 package ethier.alex.world.addon;
 
-import ethier.alex.world.core.data.NumeralArray;
+import ethier.alex.world.core.data.ElementList;
+import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,8 +19,8 @@ public class PartitionBuilder {
 
     private static Logger logger = Logger.getLogger(PartitionBuilder.class);
     private Partition partition;
-    private Collection<NumeralArray> filters;
-    private NumeralArray elements;
+    private Collection<FilterList> filters;
+    private ElementList elements;
     private int[] radices;
     private boolean isBlankWorld = false;
 
@@ -51,7 +52,7 @@ public class PartitionBuilder {
         return this;
     }
 
-    public PartitionBuilder addFilter(NumeralArray newFilter) {
+    public PartitionBuilder addFilter(FilterList newFilter) {
         if (partition != null) {
             throw new RuntimeException("Partition already created.");
         }
@@ -61,7 +62,7 @@ public class PartitionBuilder {
         return this;
     }
 
-    public PartitionBuilder addFilters(Collection<NumeralArray> newFilters) {
+    public PartitionBuilder addFilters(Collection<FilterList> newFilters) {
         if (partition != null) {
             throw new RuntimeException("Partition already created.");
         }
@@ -77,9 +78,9 @@ public class PartitionBuilder {
             return partition;
         } else {
             if(isBlankWorld) {
-                elements = NumeralArrayBuilder.newInstance()
+                elements = ElementListBuilder.newInstance()
                         .setBlankWorld(radices.length)
-                        .getNumeralArray();
+                        .getElementList();
             }
             
             if (elements == null) {
@@ -102,7 +103,7 @@ public class PartitionBuilder {
             stringBuilder.append("Combination: null\n");
         }
 
-        for (NumeralArray filter : filters) {
+        for (FilterList filter : filters) {
             stringBuilder.append(filter.toString()).append("\n");
         }
 
