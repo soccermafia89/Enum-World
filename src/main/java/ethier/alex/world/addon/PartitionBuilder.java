@@ -17,10 +17,11 @@ import org.apache.log4j.Logger;
 public class PartitionBuilder {
 
     private static Logger logger = Logger.getLogger(PartitionBuilder.class);
-    
     private Partition partition;
     private Collection<NumeralArray> filters;
     private NumeralArray elements;
+    private int[] radices;
+    private boolean isBlankWorld = false;
 
     public static PartitionBuilder newInstance() {
         return new PartitionBuilder();
@@ -35,10 +36,17 @@ public class PartitionBuilder {
             throw new RuntimeException("Partition already created.");
         }
 
-        elements = NumeralArrayBuilder.newInstance()
-                .setRadices(myRadices)
-                .setBlankWorld()
-                .getNumeralArray();        
+        radices = myRadices;
+
+        return this;
+    }
+
+    public PartitionBuilder setBlankWorld() {
+        if (partition != null) {
+            throw new RuntimeException("Partition already created.");
+        }
+
+        isBlankWorld = true;
 
         return this;
     }
@@ -53,12 +61,12 @@ public class PartitionBuilder {
         return this;
     }
 
-    public PartitionBuilder addFilters(Collection<NumeralArray> filters) {
+    public PartitionBuilder addFilters(Collection<NumeralArray> newFilters) {
         if (partition != null) {
             throw new RuntimeException("Partition already created.");
         }
 
-        filters.addAll(filters);
+        filters.addAll(newFilters);
 
         return this;
     }
@@ -68,27 +76,34 @@ public class PartitionBuilder {
         if (partition != null) {
             return partition;
         } else {
+            if(isBlankWorld) {
+                elements = NumeralArrayBuilder.newInstance()
+                        .setBlankWorld(radices.length)
+                        .getNumeralArray();
+            }
+            
             if (elements == null) {
-                throw new RuntimeException("PartitionBuilder does not have valid bit list set.");
+                throw new RuntimeException("PartitionBuilder does not have valid elements list set.");
             } else {
-                
-                partition = new Partition(elements, filters);
+
+                partition = new Partition(radices, elements, filters);
                 return partition;
             }
         }
     }
 
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
         if (elements != null) {
-            stringBuilder.append("Combination: " + elements.toString() + "\n");
+            stringBuilder.append("Combination: ").append(elements.toString()).append("\n");
         } else {
             stringBuilder.append("Combination: null\n");
         }
 
         for (NumeralArray filter : filters) {
-            stringBuilder.append(filter.toString() + "\n");
+            stringBuilder.append(filter.toString()).append("\n");
         }
 
         return stringBuilder.toString();

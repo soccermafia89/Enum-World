@@ -72,7 +72,7 @@ public class SimpleProcessor {
         Collection<NumeralArray> filters = partition.getFilters();
         int splitIndex = partition.getSplitIndex();
         
-        int radix = combination.get(splitIndex).getRadix();
+        int radix = partition.getRadices()[splitIndex];
         
         Collection<NumeralArray>[] filterSplits = new Collection[radix];
         for(int i=0; i < filterSplits.length;i++) {
@@ -103,11 +103,10 @@ public class SimpleProcessor {
         // This is the key to computing quickly.
         if(allBothFilters) {
             
-            Numeral numeral = combination.get(splitIndex);
-            Element allElement = new Element(numeral.getRadix(), ElementState.ALL);
+            Element allElement = new Element(ElementState.ALL);
             partition.getElements().set(splitIndex, allElement);
 
-            Partition allPartition = new Partition(partition.getElements(), filterSplits[0]);
+            Partition allPartition = new Partition(partition.getRadices(), partition.getElements(), filterSplits[0]);
             
             if(!matchExists(allPartition)) {
                 newPartitions.add(allPartition);
@@ -119,7 +118,7 @@ public class SimpleProcessor {
             for(int i=0;i < filterSplits.length;i++) {
                 Collection<NumeralArray> filterCollection = filterSplits[i];
                 NumeralArray splitCombination = combinationSplits[i];
-                Partition splitPartition = new Partition(splitCombination, filterCollection);
+                Partition splitPartition = new Partition(partition.getRadices(), splitCombination, filterCollection);
                 
                 logger.info("New partition made: " + splitPartition.printElements());
                 

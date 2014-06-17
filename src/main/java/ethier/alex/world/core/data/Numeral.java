@@ -11,8 +11,6 @@ package ethier.alex.world.core.data;
 public interface Numeral {
     
     public int getOrdinal();
-    
-    public int getRadix();
-    
+        
     public Enum getState();
 }

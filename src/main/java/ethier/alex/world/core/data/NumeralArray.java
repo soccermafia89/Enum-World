@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 public class NumeralArray implements Iterable {
 
     private static Logger logger = Logger.getLogger(NumeralArray.class);
-    
     private Numeral[] numeralArray;
 
     public NumeralArray(Numeral[] myNumeralArray) {
@@ -25,6 +24,24 @@ public class NumeralArray implements Iterable {
 
     public int getLength() {
         return numeralArray.length;
+    }
+
+    public int[] getOrdinals() {
+        int[] ordinals = new int[numeralArray.length];
+        for (int i = 0; i < numeralArray.length; i++) {
+            ordinals[i] = this.get(i).getOrdinal();
+        }
+
+        return ordinals;
+    }
+
+    public Enum[] getStates() {
+        Enum[] states = new Enum[numeralArray.length];
+        for (int i = 0; i < numeralArray.length; i++) {
+            states[i] = this.get(i).getState();
+        }
+        
+        return states;
     }
 
     public Numeral get(int i) {
@@ -46,11 +63,11 @@ public class NumeralArray implements Iterable {
     }
 
     public Matches getMatch(NumeralArray second, int splitIndex) {
-        
+
         //TODO: Instead of constantly retesting for matching, save the match results within each filter.
         //Only retest matching on split indexes.
         int start;
-        if(splitIndex == -1) {
+        if (splitIndex == -1) {
             start = 0;
         } else {
             start = splitIndex;
@@ -59,10 +76,7 @@ public class NumeralArray implements Iterable {
         boolean possibleMatch = false;
 
         for (int i = start; i < numeralArray.length; i++) {
-            
-            logger.info("SPLIT INDEX DURING MATCH: " + splitIndex);
-            logger.info("MATCHING WITH NUMERAL ARRAY: " + (new NumeralArray(numeralArray)).toString());
-            
+
             Numeral firstNumeral = numeralArray[i];
             Numeral secondNumeral = second.get(i);
 
@@ -119,7 +133,7 @@ public class NumeralArray implements Iterable {
             return Matches.ENTIRELY;
         }
     }
-    
+
     public String toString() {
         return Arrays.toString(numeralArray);
     }

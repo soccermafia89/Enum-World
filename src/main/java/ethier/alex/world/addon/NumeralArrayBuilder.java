@@ -16,9 +16,9 @@ public class NumeralArrayBuilder {
 
     private static Logger logger = Logger.getLogger(NumeralArrayBuilder.class);
     private NumeralArray numeralArray;
-    private int[] radices;
     private int[] ordinals;
     private Enum[] combinationStates;
+    private int worldLength;
     private boolean blankWorld = false;
     private boolean isFilter = false;
 
@@ -38,21 +38,39 @@ public class NumeralArrayBuilder {
         return this;
     }
 
-    public NumeralArrayBuilder setBlankWorld() {
+    public NumeralArrayBuilder setAsFilter(String inputStr) {
+
+        if (numeralArray != null) {
+            throw new RuntimeException("NumeralArray already created.");
+        }
+        isFilter = true;
+
+
+        char[] chars = inputStr.toCharArray();
+        int[] myOrdinals = new int[chars.length];
+
+        for (int i = 0; i < chars.length; i++) {
+            char charchar = chars[i];
+
+            if (charchar == '*') {
+                myOrdinals[i] = -1;
+            } else {
+                myOrdinals[i] = Character.getNumericValue(charchar);;
+            }
+        }
+
+        ordinals = myOrdinals;
+        worldLength = ordinals.length;
+        return this;
+    }
+
+    public NumeralArrayBuilder setBlankWorld(int myWorldLength) {
         if (numeralArray != null) {
             throw new RuntimeException("NumeralArray already created.");
         }
         blankWorld = true;
+        worldLength = myWorldLength;
 
-        return this;
-    }
-
-    public NumeralArrayBuilder setRadices(int[] myRadices) {
-        if (numeralArray != null) {
-            throw new RuntimeException("NumeralArray already created.");
-        }
-
-        radices = myRadices;
         return this;
     }
 
@@ -62,15 +80,16 @@ public class NumeralArrayBuilder {
         }
 
         ordinals = myOrdinals;
+        worldLength = ordinals.length;
         return this;
     }
 
-    public NumeralArrayBuilder setElementStates(ElementState[] myElementStates) {
+    public NumeralArrayBuilder setStates(Enum[] states) {
         if (numeralArray != null) {
             throw new RuntimeException("NumeralArray already created.");
         }
 
-        combinationStates = myElementStates;
+        combinationStates = states;
         return this;
     }
 
@@ -78,14 +97,14 @@ public class NumeralArrayBuilder {
         if (numeralArray == null) {
 
             if (blankWorld) {
-                combinationStates = new ElementState[radices.length];
-                for (int i = 0; i < combinationStates.length; i++) {
+                combinationStates = new ElementState[worldLength];
+                for (int i = 0; i < worldLength; i++) {
                     combinationStates[i] = ElementState.UNSET;
                 }
             }
 
             if (isFilter) {
-                
+
                 if (combinationStates == null) {
                     combinationStates = new Enum[ordinals.length];
                 }
@@ -101,32 +120,36 @@ public class NumeralArrayBuilder {
                 }
             }
 
-            Numeral[] numerals = new Numeral[radices.length];
+            Numeral[] numerals = new Numeral[worldLength];
 
             if (!isFilter) {
 
-                for (int i = 0; i < radices.length; i++) {
+                for (int i = 0; i < worldLength; i++) {
 
                     Numeral newNumeral;
                     if (combinationStates[i] == ElementState.SET) {
-                        newNumeral = new Element(radices[i], ordinals[i]);
+                        newNumeral = new Element(ordinals[i]);
                     } else {
-                        newNumeral = new Element(radices[i], combinationStates[i]);
+                        newNumeral = new Element(combinationStates[i]);
                     }
 
                     numerals[i] = newNumeral;
                 }
 
             } else if (isFilter) {
-                for (int i = 0; i < radices.length; i++) {
+                for (int i = 0; i < worldLength; i++) {
 
-                    numerals[i] = new FilterElement(radices[i], ordinals[i]);
+                    if (combinationStates[i] == FilterElementState.ALL) {
+                        numerals[i] = new FilterElement(combinationStates[i]);
+                    } else {
+                        numerals[i] = new FilterElement(ordinals[i]);
+                    }
                 }
             }
-            
+
             numeralArray = new NumeralArray(numerals);
         }
-        
+
         return numeralArray;
     }
 }

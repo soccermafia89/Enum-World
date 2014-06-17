@@ -20,10 +20,12 @@ public class Partition {
     NumeralArray elements;
     Collection<NumeralArray> filters;
     private int splitIndex = -1;
+    private int[] radices;
 
-    public Partition(NumeralArray myElements, Collection<NumeralArray> myFilters) {
+    public Partition(int[] myRadices, NumeralArray myElements, Collection<NumeralArray> myFilters) {
         elements = myElements;
         filters = myFilters;
+        radices = myRadices;
 
         for (int i = 0; i < elements.getLength(); i++) {
 
@@ -32,6 +34,10 @@ public class Partition {
                 splitIndex = i;
             }
         }
+    }
+    
+    public int[] getRadices() {
+        return radices;
     }
     
     public Collection<NumeralArray> getFilters() {
@@ -47,14 +53,13 @@ public class Partition {
     }
     
     public NumeralArray[] getSplits() {
-        Numeral elementSplit = elements.get(splitIndex);
-        int radix = elementSplit.getRadix();
+        int radix = radices[splitIndex];
         
         NumeralArray[] elementSplits = new NumeralArray[radix];
         
         for(int i=0;i < radix;i++) {
             NumeralArray newSplit = elements.copy();
-            Element newElement = new Element(elementSplit.getRadix(), i);
+            Element newElement = new Element(i);
             newSplit.set(splitIndex, newElement);
             
             elementSplits[i] = newSplit;
