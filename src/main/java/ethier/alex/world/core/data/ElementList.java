@@ -35,7 +35,7 @@ public class ElementList implements Iterable {
         return ordinals;
     }
 
-    public ElementState[] getStates() {
+    public ElementState[] getElementStates() {
         ElementState[] elementStates = new ElementState[elementArray.length];
         for (int i = 0; i < elementArray.length; i++) {
             elementStates[i] = (ElementState)this.getElement(i).getElementState();
@@ -77,7 +77,7 @@ public class ElementList implements Iterable {
 
         for (int i = start; i < elementArray.length; i++) {
             
-            FilterElementState filterElementState = filterList.getFilter(i).getFilterState();
+            FilterState filterElementState = filterList.getFilter(i).getFilterState();
             ElementState elementState = this.getElement(i).getElementState();
 
 
@@ -86,7 +86,7 @@ public class ElementList implements Iterable {
             //2) If 1 is false, and the element is UNSET it is now a part match.
             //3) If the bits match, then they still match.
             //4) Otherwise they completely don't match.
-            if (filterElementState == FilterElementState.ALL || elementState == ElementState.ALL) {
+            if (filterElementState == FilterState.ALL || elementState == ElementState.ALL) {
                 continue;
             } else if (elementState == ElementState.UNSET) {
                 possibleMatch = true; // No longer a match, only a possible match.

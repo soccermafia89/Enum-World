@@ -17,7 +17,7 @@ public class FilterListBuilder {
     private static Logger logger = Logger.getLogger(FilterListBuilder.class);
     private FilterList filterArray;
     private int[] ordinals;
-    private FilterElementState[] filterStates;
+    private FilterState[] filterStates;
     private int worldLength;
 
     public static FilterListBuilder newInstance() {
@@ -61,7 +61,7 @@ public class FilterListBuilder {
         return this;
     }
 
-    public FilterListBuilder setFilterStates(FilterElementState[] states) {
+    public FilterListBuilder setFilterStates(FilterState[] states) {
         if (filterArray != null) {
             throw new RuntimeException("NumeralArray already created.");
         }
@@ -74,29 +74,29 @@ public class FilterListBuilder {
         if (filterArray == null) {
 
             if (filterStates == null) {
-                filterStates = new FilterElementState[ordinals.length];
+                filterStates = new FilterState[ordinals.length];
             }
 
             for (int i = 0; i < ordinals.length; i++) {
                 if (filterStates[i] == null) {
                     if (ordinals[i] < 0) {
-                        filterStates[i] = FilterElementState.ALL;
+                        filterStates[i] = FilterState.ALL;
                     } else {
-                        filterStates[i] = FilterElementState.ONE;
+                        filterStates[i] = FilterState.ONE;
                     }
                 }
             }
 
 
-            FilterElement[] newFilterElements = new FilterElement[worldLength];
+            Filter[] newFilterElements = new Filter[worldLength];
 
 
             for (int i = 0; i < worldLength; i++) {
 
-                if (filterStates[i] == FilterElementState.ALL) {
-                    newFilterElements[i] = new FilterElement(filterStates[i]);
+                if (filterStates[i] == FilterState.ALL) {
+                    newFilterElements[i] = new Filter(filterStates[i]);
                 } else {
-                    newFilterElements[i] = new FilterElement(ordinals[i]);
+                    newFilterElements[i] = new Filter(ordinals[i]);
                 }
             }
 

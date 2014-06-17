@@ -9,31 +9,31 @@ package ethier.alex.world.core.data;
  @author alex
  */
 
-public class FilterElement implements Numeral {
+public class Filter implements Numeral {
     
-    private FilterElementState filterElementState;
+    private FilterState filterElementState;
     private int ordinal; // The ordinal value.
     
-    public FilterElement(Enum myFilterElementState) {
-        if(myFilterElementState == FilterElementState.ONE) {
+    public Filter(Enum myFilterElementState) {
+        if(myFilterElementState == FilterState.ONE) {
              throw new RuntimeException("FilterElementState.ONE not allowed for this constructor.");
         }
         
-        filterElementState = (FilterElementState) myFilterElementState;
+        filterElementState = (FilterState) myFilterElementState;
         ordinal = -1;
     }
     
-    public FilterElement(int myOrdinal) {
+    public Filter(int myOrdinal) {
         ordinal = myOrdinal;
         if(myOrdinal < 0) {
-            filterElementState = FilterElementState.ALL;
+            filterElementState = FilterState.ALL;
         } else {
-            filterElementState = FilterElementState.ONE;
+            filterElementState = FilterState.ONE;
         }
     }
     
-    public FilterElement(int myRadix, int myOrdinal, Enum myElementState) {
-        filterElementState = (FilterElementState) myElementState;
+    public Filter(int myRadix, int myOrdinal, Enum myElementState) {
+        filterElementState = (FilterState) myElementState;
         ordinal = myOrdinal;
     }    
     
@@ -42,7 +42,7 @@ public class FilterElement implements Numeral {
         return ordinal;
     }
     
-    public FilterElementState getFilterState() {
+    public FilterState getFilterState() {
         return filterElementState;
     }
     

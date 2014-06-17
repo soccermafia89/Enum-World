@@ -80,15 +80,15 @@ public class SimpleProcessor {
 
         boolean allBothFilters = true;
         for(FilterList filter : filters) {
-            FilterElement filterElement = filter.getFilter(splitIndex);
+            Filter filterElement = filter.getFilter(splitIndex);
             
-            if(filterElement.getFilterState() == FilterElementState.ALL) {
+            if(filterElement.getFilterState() == FilterState.ALL) {
                 
                 for(Collection<FilterList> filterSplit : filterSplits) {
                     filterSplit.add(filter);
                 }
                 
-            } else if(filterElement.getFilterState() == FilterElementState.ONE) {
+            } else if(filterElement.getFilterState() == FilterState.ONE) {
                 int ordinal = filterElement.getOrdinal();
                 filterSplits[ordinal].add(filter);
                 

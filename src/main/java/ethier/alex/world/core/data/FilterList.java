@@ -16,9 +16,9 @@ import org.apache.log4j.Logger;
 public class FilterList implements Iterable {
 
     private static Logger logger = Logger.getLogger(FilterList.class);
-    private FilterElement[] filterElements;
+    private Filter[] filterElements;
 
-    public FilterList(FilterElement[] myFilterElements) {
+    public FilterList(Filter[] myFilterElements) {
         filterElements = myFilterElements;
     }
 
@@ -35,8 +35,8 @@ public class FilterList implements Iterable {
         return ordinals;
     }
 
-    public FilterElementState[] getFilterStates() {
-        FilterElementState[] filterStates = new FilterElementState[filterElements.length];
+    public FilterState[] getFilterStates() {
+        FilterState[] filterStates = new FilterState[filterElements.length];
         for (int i = 0; i < filterElements.length; i++) {
             filterStates[i] = this.getFilter(i).getFilterState();
         }
@@ -44,21 +44,21 @@ public class FilterList implements Iterable {
         return filterStates;
     }
 
-    public FilterElement getFilter(int i) {
+    public Filter getFilter(int i) {
         return filterElements[i];
     }
 
     public FilterList copy() {
-        FilterElement[] newFilterElementArray = Arrays.copyOf(filterElements, filterElements.length);
+        Filter[] newFilterElementArray = Arrays.copyOf(filterElements, filterElements.length);
         return new FilterList(newFilterElementArray);
     }
 
-    public void set(int i, FilterElement filterElement) {
+    public void set(int i, Filter filterElement) {
         filterElements[i] = filterElement;
     }
 
     @Override
-    public Iterator<FilterElement> iterator() {
+    public Iterator<Filter> iterator() {
         return new NumeralArrayIterator(filterElements);
     }
 

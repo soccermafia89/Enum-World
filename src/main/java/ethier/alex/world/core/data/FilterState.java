@@ -8,7 +8,7 @@ package ethier.alex.world.core.data;
 
  @author alex
  */
-public enum FilterElementState {
+public enum FilterState {
 
     ALL, ONE;
     

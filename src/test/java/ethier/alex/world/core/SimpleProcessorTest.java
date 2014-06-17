@@ -159,13 +159,13 @@ public class SimpleProcessorTest {
                 logger.debug(resultCombination);
                 int[] resultOrdinals = resultCombination.getOrdinals();
                 
-                Enum[] resultElementStates = resultCombination.getStates();
-                FilterElementState[] complementFilterStates = new FilterElementState[resultElementStates.length];
+                Enum[] resultElementStates = resultCombination.getElementStates();
+                FilterState[] complementFilterStates = new FilterState[resultElementStates.length];
                 for(int i=0; i < resultElementStates.length; i++) {
                     if(resultElementStates[i] == ElementState.ALL) {
-                        complementFilterStates[i] = FilterElementState.ALL;
+                        complementFilterStates[i] = FilterState.ALL;
                     } else if(resultElementStates[i] == ElementState.SET){
-                        complementFilterStates[i] = FilterElementState.ONE;
+                        complementFilterStates[i] = FilterState.ONE;
                     } else {
                         throw new RuntimeException("Invalid state reached.");
                     }                    
