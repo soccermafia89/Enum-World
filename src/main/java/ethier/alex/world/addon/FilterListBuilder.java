@@ -5,7 +5,6 @@
 package ethier.alex.world.addon;
 
 import ethier.alex.world.core.data.*;
-import java.util.Iterator;
 import org.apache.log4j.Logger;
 
 /**
@@ -48,6 +47,31 @@ public class FilterListBuilder {
 
         ordinals = myOrdinals;
         worldLength = ordinals.length;
+        return this;
+    }
+
+    public FilterListBuilder setFromElementList(ElementList elementList) {
+        if (filterArray != null) {
+            throw new RuntimeException("NumeralArray already created.");
+        }
+
+        ordinals = new int[elementList.getLength()];
+        filterStates = new FilterState[elementList.getLength()];
+
+        for (int i = 0; i < elementList.getLength(); i++) {
+            Element element = elementList.getElement(i);
+
+            if (element.getElementState() == ElementState.ALL) {
+                ordinals[i] = -1;
+                filterStates[i] = FilterState.ALL;
+            } else if (element.getElementState() == ElementState.SET) {
+                ordinals[i] = element.getOrdinal();
+                filterStates[i] = FilterState.ONE;
+            } else {
+                throw new RuntimeException("Cannot build filter from unset element: " + elementList);
+            }
+        }
+
         return this;
     }
 

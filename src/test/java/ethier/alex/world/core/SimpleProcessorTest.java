@@ -9,6 +9,7 @@ import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
+import ethier.alex.world.query.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -87,7 +88,28 @@ public class SimpleProcessorTest {
             System.out.println("Final partition computed: " + finalElement.toString());
         }
         
-        Assert.assertTrue(true);
+        FilterList filter1query1 = FilterListBuilder.newInstance()
+                .setQuick("**2*")
+                .getFilterList();
+        
+//        FilterList filter1query2 = FilterListBuilder.newInstance()
+//                .setQuick("10**")
+//                .getFilterList();
+//        FilterList filter2query2 = FilterListBuilder.newInstance()
+//                .setQuick("2***")
+//                .getFilterList();
+//        Collection<FilterList> query2 = new ArrayList();
+//        query2.add(filter1query2);
+//        query2.add(filter2query2);
+        
+        Query query = new Query(radices, finalElements);
+        double queryResult1 = query.query(filter1query1);
+//        double queryResult2 = query.query(query2);
+        
+        Assert.assertTrue(queryResult1 == 1.0);
+//        Assert.assertTrue(queryResult2 == 6 / (double) 7);
+//        System.out.println("Query: " + filter1query1 + " => " + queryResult1);
+//        System.out.println("Query: " + query2 + " => " + queryResult2);
     }
     
     @Test
@@ -109,8 +131,8 @@ public class SimpleProcessorTest {
 
 //            int ones = 8;
 //            int worldLength = 16;
-            int ones = 3;
-            int worldLength = 8;
+            int ones = 2;
+            int worldLength = 4;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
