@@ -47,6 +47,10 @@ public class Query {
 //        logger.info("Radices: " + Arrays.toString(radices));
 //        logger.info("Query World Size: " + worldSize);
     }
+    
+    public long getWorldSize() {
+        return worldSize.longValueExact();
+    }
 
     public double query(FilterList filter) {
         BigDecimal score = BigDecimal.valueOf(0L);
@@ -56,9 +60,7 @@ public class Query {
             score = score.add(this.getWeightedMatch(filter, element));
         }
 
-        logger.info("Query Score: " + score + " World Size: " + worldSize + " max value: " + Long.MAX_VALUE);
         return score.divide(worldSize, 10, RoundingMode.UP).doubleValue();
-
     }
     
 //      TODO: In order to calculate this properly we have to substract the union of the filters, not an easy task.
