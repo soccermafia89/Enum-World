@@ -9,7 +9,7 @@ import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
-import ethier.alex.world.query.Query;
+import ethier.alex.world.query.Wizard;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -102,7 +102,7 @@ public class SimpleProcessorTest {
 //        query2.add(filter1query2);
 //        query2.add(filter2query2);
         
-        Query query = new Query(radices, finalElements);
+        Wizard query = new Wizard(radices, finalElements);
         double queryResult1 = query.query(filter1query1);
 //        double queryResult2 = query.query(query2);
         

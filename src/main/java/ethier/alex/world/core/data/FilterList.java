@@ -139,6 +139,18 @@ public class FilterList {
 
     @Override
     public String toString() {
-        return Arrays.toString(filters);
+        String[] copy = new String[filters.length];
+        
+        for(int i=0;i < filters.length; i++) {
+            Filter filter = filters[i];
+            
+            if(filter.getFilterState() == FilterState.ALL) {
+                copy[i] = "*";
+            } else {
+                copy[i] = "" + filter.getOrdinal();
+            }
+        }
+        
+        return Arrays.toString(copy);
     }
 }

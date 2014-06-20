@@ -69,8 +69,7 @@ public class Partition {
     }
 
     public boolean hasSplit() {
-        logger.info("elements: " + elements.toString());
-        
+//        logger.info("elements: " + elements.toString());
         if (splitIndex > -1) {
             return true;
         } else {

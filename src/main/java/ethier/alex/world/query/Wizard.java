@@ -7,7 +7,6 @@ package ethier.alex.world.query;
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.Collection;
 import org.apache.log4j.Logger;
@@ -16,14 +15,14 @@ import org.apache.log4j.Logger;
 
  @author alex
  */
-public class Query {
+public class Wizard {
 
     private static Logger logger = Logger.getLogger(SimpleProcessor.class);
     Collection<ElementList> elements;
     int[] radices;
     BigDecimal worldSize;
 
-    public Query(int[] myRadices, Collection<ElementList> myElements) {
+    public Wizard(int[] myRadices, Collection<ElementList> myElements) {
         radices = myRadices;
         elements = myElements;
 
@@ -63,7 +62,8 @@ public class Query {
         return score.divide(worldSize, 10, RoundingMode.UP).doubleValue();
     }
     
-//      TODO: In order to calculate this properly we have to substract the union of the filters, not an easy task.
+//    To accomplish this:  While calculating the weight, process with all filters
+//    Only return the MAX(weight) found.  AKA rewrtie getWeightedMatch to handle multiple filters.
 //    public double query(Collection<FilterList> filters) {
 //    }
 
