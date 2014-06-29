@@ -59,12 +59,12 @@ public class SimpleProcessor {
             it.remove();
         }
         
-        logger.debug(newPartitionSet.size() + " new incomplete partitions created.");
+//        logger.debug(newPartitionSet.size() + " new incomplete partitions created.");
         incompletePartitions = newPartitionSet;
     }
     
     public Collection<Partition> splitPartition(Partition partition) {
-        logger.debug("Splitting partition with combination: " + partition.printElements() + " with split index: " + partition.getSplitIndex());
+//        logger.debug("Splitting partition with combination: " + partition.printElements() + " with split index: " + partition.getSplitIndex());
         
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         
@@ -127,13 +127,13 @@ public class SimpleProcessor {
             }
         }
         
-        for(Partition newPartition : newPartitions) {
-            if(newPartition.verifyIntegrity() == false) {
-                logger.error("Integrity not maintained for partition: "  + newPartition.printElements());
-            } else {
-                logger.debug("New Partition: " + newPartition.printElements());
-            }
-        }
+//        for(Partition newPartition : newPartitions) {
+//            if(newPartition.verifyIntegrity() == false) {
+//                logger.error("Integrity not maintained for partition: "  + newPartition.printElements());
+//            } else {
+//                logger.debug("New Partition (verified integrity): " + newPartition.printElements());
+//            }
+//        }
 
         return newPartitions;
     }

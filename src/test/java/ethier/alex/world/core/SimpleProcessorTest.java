@@ -145,25 +145,22 @@ public class SimpleProcessorTest {
 
             String filterStr = "";
             int count = 0;
-            while (true) {
-                    if (filterStr.equals(breakStr)) {
-                            break;
-                    }
+            while (!filterStr.equals(breakStr)) {
 
-                    filterStr = "" + Integer.toBinaryString(count);
-                    filterStr = StringUtils.leftPad(filterStr, worldLength, '0');
-                    int combOnes = StringUtils.countMatches(filterStr, "1");
-                    if (combOnes == ones) {
-                        FilterList filter = FilterListBuilder.newInstance()
-                                .setQuick(filterStr)
-                                .getFilterList();
-                                
-                        logger.debug("Adding filter: " + filter);
-                        filters.add(filter);
-                    }
-                    
+                filterStr = "" + Integer.toBinaryString(count);
+                filterStr = StringUtils.leftPad(filterStr, worldLength, '0');
+                int combOnes = StringUtils.countMatches(filterStr, "1");
+                if (combOnes == ones) {
+                    FilterList filter = FilterListBuilder.newInstance()
+                            .setQuick(filterStr)
+                            .getFilterList();
 
-                    count++;
+                    logger.debug("Adding filter: " + filter);
+                    filters.add(filter);
+                }
+
+
+                count++;
             }
             
             Partition rootPartition = PartitionBuilder.newInstance()
