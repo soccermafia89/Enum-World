@@ -88,6 +88,7 @@ public class SimpleProcessorTest {
             System.out.println("Final partition computed: " + finalElement.toString());
         }
         
+        
         FilterList filter1query1 = FilterListBuilder.newInstance()
                 .setQuick("**2*")
                 .getFilterList();
@@ -102,14 +103,38 @@ public class SimpleProcessorTest {
 //        query2.add(filter1query2);
 //        query2.add(filter2query2);
         
-        Wizard query = new Wizard(radices, finalElements);
-        double queryResult1 = query.query(filter1query1);
-//        double queryResult2 = query.query(query2);
+        Collection<FilterList> filterQueries2 = new ArrayList<FilterList>();
+        FilterList filter1query2 = FilterListBuilder.newInstance()
+    		  .setQuick("*0**")
+    		  .getFilterList();
+        FilterList filter2query2 = FilterListBuilder.newInstance()
+    		  .setQuick("*1**")
+    		  .getFilterList();
+        filterQueries2.add(filter1query2);
+        filterQueries2.add(filter2query2);
         
+        Collection<FilterList> filterQueries3 = new ArrayList<FilterList>();
+        FilterList filter1query3 = FilterListBuilder.newInstance()
+    		  .setQuick("10**")
+    		  .getFilterList();
+        FilterList filter2query3 = FilterListBuilder.newInstance()
+    		  .setQuick("1**1")
+    		  .getFilterList();
+        filterQueries3.add(filter1query3);
+        filterQueries3.add(filter2query3);
+        
+        Wizard query = new Wizard(radices, finalElements);
+        System.out.println("World Size: " + query.getWorldSize());
+        
+        double queryResult1 = query.query(filter1query1);
         Assert.assertTrue(queryResult1 == 1.0);
-//        Assert.assertTrue(queryResult2 == 6 / (double) 7);
-//        System.out.println("Query: " + filter1query1 + " => " + queryResult1);
-//        System.out.println("Query: " + query2 + " => " + queryResult2);
+        
+        double queryResult2 = query.query(filterQueries2);
+        Assert.assertTrue(queryResult2 == 1.0);
+        
+        double queryResult3 = query.query(filterQueries3);
+        Assert.assertTrue(TestUtils.compareDoubles(queryResult3, (3.0 / 7.0), 0.000001));
+
     }
     
     @Test

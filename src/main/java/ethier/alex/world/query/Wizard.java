@@ -6,9 +6,14 @@ package ethier.alex.world.query;
 
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.SimpleProcessor;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -34,17 +39,13 @@ public class Wizard {
                 Element element = elementList.getElement(i);
 
                 if (element.getElementState() == ElementState.ALL) {
-//                    weight = weight * radices[i];
                     weight = weight.multiply(BigDecimal.valueOf(radices[i]));
                 }
             }
 
             worldSize = worldSize.add(weight);
-//            logger.info("World weight for: " + elementList + " is: " + weight);
         }
 
-//        logger.info("Radices: " + Arrays.toString(radices));
-//        logger.info("Query World Size: " + worldSize);
     }
     
     public long getWorldSize() {
@@ -52,44 +53,77 @@ public class Wizard {
     }
 
     public double query(FilterList filter) {
+    	Collection<FilterList> filters = new ArrayList<FilterList>();
+    	filters.add(filter);
+        return query(filters);
+    }
+    
+    public double query(Collection<FilterList> filters) {
         BigDecimal score = BigDecimal.valueOf(0L);
 
         for (ElementList element : elements) {
 
-            score = score.add(this.getWeightedMatch(filter, element));
+            score = score.add(this.getWeightedMatch(filters, element));
         }
 
         return score.divide(worldSize, 10, RoundingMode.UP).doubleValue();
     }
-    
-//    To accomplish this:  While calculating the weight, process with all filters
-//    Only return the MAX(weight) found.  AKA rewrtie getWeightedMatch to handle multiple filters.
-//    public double query(Collection<FilterList> filters) {
-//    }
 
-    private BigDecimal getWeightedMatch(FilterList filterList, ElementList elementList) {
+    private BigDecimal getWeightedMatch(Collection<FilterList> filterLists, ElementList elementList) {
 
         BigDecimal weight = BigDecimal.valueOf(1L);
 
-        for (int i = 0; i < filterList.getLength(); i++) {
-            Filter filter = filterList.getFilter(i);
-            Element element = elementList.getElement(i);
-
-            if (element.getElementState() == ElementState.ALL) {
-                if (filter.getFilterState() == FilterState.ALL) {
-                    weight = weight.multiply(BigDecimal.valueOf(radices[i]));
-                }
-            } else if (element.getElementState() == ElementState.SET) {
-                if (filter.getFilterState() == FilterState.ONE && filter.getOrdinal() != element.getOrdinal()) {
-                    return BigDecimal.valueOf(0L);
-                }
-            } else {
-                throw new RuntimeException("Invalid element state in query: " + element.getElementState());
-            }
+        for (int i = 0; i < radices.length; i=i+1) {
+        	
+        	Collection<Filter> filters = new ArrayList<Filter>();
+        	for(FilterList filterList : filterLists) {
+        		filters.add(filterList.getFilter(i));
+        	}
+        	
+        	int elementWeight = getUnionMaxWeight(filters, elementList.getElement(i), i);
+        	
+        	if(elementWeight == 0) {
+        		return BigDecimal.valueOf(0L);
+        	} else {
+        		weight = weight.multiply(BigDecimal.valueOf(elementWeight));
+        	}
         }
 
-//        logger.info("Weighteed match for: " + filterList + " => " + elementList + " is: " + weight);
-
         return weight;
+    }
+    
+    private int getUnionMaxWeight(Collection<Filter> filters, Element element, int matchPos) {
+    	
+    	boolean allFilterPresent = false;
+    	Set<Integer> filterOrdinals = new HashSet<Integer>();
+    	for(Filter filter : filters) {
+    		
+    		if(filter.getFilterState() == FilterState.ALL) {
+    			allFilterPresent = true;
+    			break;
+    		}
+    		
+    		filterOrdinals.add(filter.getOrdinal());
+    	}
+    	
+    	if(allFilterPresent && element.getElementState() == ElementState.ALL) {
+    		return radices[matchPos];
+    	} else if(allFilterPresent && element.getElementState() == ElementState.SET) {
+    		return 1;
+    	} else if(!allFilterPresent && element.getElementState() == ElementState.ALL) {
+    		return filterOrdinals.size();
+    	} else if(!allFilterPresent && element.getElementState() == ElementState.SET) {
+    		for(int filterOrdinal : filterOrdinals) {
+    			if(filterOrdinal == element.getOrdinal()) {
+    				return 1;
+    			}
+    		}
+    		
+    		return 0;
+    	} else {
+    		throw new RuntimeException("Invalid State During Query Pos: + " + matchPos + 
+    				" Element State: " + element.getElementState() +
+    				" Filters: " + filters);
+    	}
     }
 }
