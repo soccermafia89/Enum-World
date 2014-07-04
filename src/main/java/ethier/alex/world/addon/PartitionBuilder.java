@@ -31,6 +31,16 @@ public class PartitionBuilder {
     public PartitionBuilder() {
         filters = new ArrayList();
     }
+    
+    public PartitionBuilder setElements(ElementList myElements) {
+        if (partition != null) {
+            throw new RuntimeException("Partition already created.");
+        }
+
+        elements = myElements;
+
+        return this;
+    }
 
     public PartitionBuilder setRadices(int[] myRadices) {
         if (partition != null) {

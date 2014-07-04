@@ -36,6 +36,10 @@ public class SimpleProcessor {
         return finalCombinations;
     }
     
+    public Collection<Partition> getIncompletePartitions() {
+        return incompletePartitions;
+    }
+    
     public void runAll() {
         while(incompletePartitions.size() > 0) {
             this.runSet();
