@@ -4,6 +4,10 @@
  */
 package ethier.alex.world.core.data;
 
+import ethier.alex.world.addon.ElementListBuilder;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.apache.log4j.Logger;
@@ -13,10 +17,14 @@ import org.apache.log4j.Logger;
  @author alex
  */
 // Wraps an Numeral[] as a class
-public class ElementList implements Iterable {
+public class ElementList implements Iterable, Writable {
 
     private static Logger logger = Logger.getLogger(ElementList.class);
     private Element[] elementArray;
+    
+    public ElementList(DataInput in) throws IOException {
+        this.readFields(in);
+    }
 
     public ElementList(Element[] myElementArray) {
         elementArray = myElementArray;
@@ -61,57 +69,61 @@ public class ElementList implements Iterable {
     public Iterator<Element> iterator() {
         return new NumeralArrayIterator(elementArray);
     }
-    
-//    public Matches getMatch(FilterList filterList, int splitIndex) {
-//
-//        //TODO: Instead of constantly retesting for matching, save the match results within each filter.
-//        //Only retest matching on split indexes.
-//        int start;
-//        if (splitIndex == -1) {
-//            start = 0;
-//        } else {
-//            start = splitIndex;
-//        }
-//
-//        boolean possibleMatch = false;
-//
-//        for (int i = start; i < elementArray.length; i++) {
-//            
-//            FilterState filterElementState = filterList.getFilter(i).getFilterState();
-//            ElementState elementState = this.getElement(i).getElementState();
-//
-//
-//            //Order of if statements matters!
-//            //1) If either has a Both then they match
-//            //2) If 1 is false, and the element is UNSET it is now a part match.
-//            //3) If the bits match, then they still match.
-//            //4) Otherwise they completely don't match.
-//            if (filterElementState == FilterState.ALL || elementState == ElementState.ALL) {
-//                continue;
-//            } else if (elementState == ElementState.UNSET) {
-//                possibleMatch = true; // No longer a match, only a possible match.
-//            } else {
-//                int firstOrdinal = this.getElement(i).getOrdinal();
-//                int secondOrdinal = filterList.getFilter(i).getOrdinal();
-//
-//                if (firstOrdinal == secondOrdinal) {
-//                    continue;
-//                } else {
-//                    return Matches.NO;
-//                }
-//
-//            }
-//        }
-//
-//        if (possibleMatch) {
-//            return Matches.PARTLY;
-//        } else {
-//            return Matches.ENTIRELY;
-//        }
-//    }
 
     @Override
     public String toString() {
         return Arrays.toString(elementArray);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        this.writeWorldSize(out);
+        this.writeElements(out);
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.readWorldSize(in);
+        elementArray = this.readElementList(in).elementArray;    
+    }
+
+    private void writeWorldSize(DataOutput out) throws IOException {
+        out.writeInt(elementArray.length);
+    }
+
+    private void readWorldSize(DataInput in) throws IOException {
+        int worldSize = in.readInt();
+        elementArray = new Element[worldSize];
+    }
+
+    private void writeElements(DataOutput out) throws IOException {
+        int[] ordinals = this.getOrdinals();
+        for (int i = 0; i < ordinals.length; i++) {
+            out.writeInt(ordinals[i]);
+        }
+
+        ElementState[] elementStates = this.getElementStates();
+        for (int i = 0; i < elementStates.length; i++) {
+            out.writeUTF(elementStates[i].name());
+        }
+    }
+
+    private ElementList readElementList(DataInput in) throws IOException {
+        ElementListBuilder elementListBuilder = ElementListBuilder.newInstance();
+
+        int[] ordinals = new int[elementArray.length];
+        for (int i = 0; i < elementArray.length; i++) {
+            ordinals[i] = in.readInt();
+        }
+
+        ElementState[] elementStates = new ElementState[elementArray.length];
+        for (int i = 0; i < elementArray.length; i++) {
+            elementStates[i] = ElementState.valueOf(in.readUTF());
+        }
+
+        elementListBuilder.setOrdinals(ordinals);
+        elementListBuilder.setStates(elementStates);
+
+        return elementListBuilder.getElementList();
     }
 }
