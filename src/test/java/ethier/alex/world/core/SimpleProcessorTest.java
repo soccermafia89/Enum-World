@@ -200,30 +200,7 @@ public class SimpleProcessorTest {
             stopWatch.stop();
             Collection<ElementList> resultCombinations = processor.getCompletedPartitions();
 
-            Collection<FilterList> complementFilters = new ArrayList<FilterList>();
-            for(ElementList resultCombination : resultCombinations) {
-                logger.debug(resultCombination);
-                int[] resultOrdinals = resultCombination.getOrdinals();
-                
-                Enum[] resultElementStates = resultCombination.getElementStates();
-                FilterState[] complementFilterStates = new FilterState[resultElementStates.length];
-                for(int i=0; i < resultElementStates.length; i++) {
-                    if(resultElementStates[i] == ElementState.ALL) {
-                        complementFilterStates[i] = FilterState.ALL;
-                    } else if(resultElementStates[i] == ElementState.SET){
-                        complementFilterStates[i] = FilterState.ONE;
-                    } else {
-                        throw new RuntimeException("Invalid state reached.");
-                    }                    
-                }
-                                
-                FilterList complementFilter = FilterListBuilder.newInstance()
-                        .setOrdinals(resultOrdinals)
-                        .setFilterStates(complementFilterStates)
-                        .getFilterList();
-                                
-                complementFilters.add(complementFilter);                            
-            }
+            Collection<FilterList> complementFilters = generateComplementFilters(resultCombinations);
 
             Partition complementPartition = PartitionBuilder.newInstance()
                     .setRadices(radices)
@@ -255,5 +232,35 @@ public class SimpleProcessorTest {
             int secondsRun = (int) stopWatch.elapsed(TimeUnit.SECONDS);
             int origSize = originalCombinations.size();
             logger.info(origSize + " complements found and reverted in " + secondsRun + " seconds");
+    }
+    
+    public Collection<FilterList> generateComplementFilters(Collection<ElementList> elements) {
+        
+        Collection<FilterList> complementFilters = new ArrayList<FilterList>();
+        for(ElementList resultCombination : elements) {
+            logger.debug(resultCombination);
+            int[] resultOrdinals = resultCombination.getOrdinals();
+
+            Enum[] resultElementStates = resultCombination.getElementStates();
+            FilterState[] complementFilterStates = new FilterState[resultElementStates.length];
+            for(int i=0; i < resultElementStates.length; i++) {
+                if(resultElementStates[i] == ElementState.ALL) {
+                    complementFilterStates[i] = FilterState.ALL;
+                } else if(resultElementStates[i] == ElementState.SET){
+                    complementFilterStates[i] = FilterState.ONE;
+                } else {
+                    throw new RuntimeException("Invalid state reached.");
+                }                    
+            }
+
+            FilterList complementFilter = FilterListBuilder.newInstance()
+                    .setOrdinals(resultOrdinals)
+                    .setFilterStates(complementFilterStates)
+                    .getFilterList();
+
+            complementFilters.add(complementFilter);                            
+        }
+        
+        return complementFilters;
     }
 }
