@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
  @author alex
  */
-public class SimpleProcessor {
+public class SimpleProcessor implements Processor {
     
     private static Logger logger = Logger.getLogger(SimpleProcessor.class);
     
@@ -32,20 +32,24 @@ public class SimpleProcessor {
         finalCombinations = new ArrayList<ElementList>();   
     }
     
+    @Override
     public Collection<ElementList> getCompletedPartitions() {
         return finalCombinations;
     }
     
+    @Override
     public Collection<Partition> getIncompletePartitions() {
         return incompletePartitions;
     }
     
+    @Override
     public void runAll() {
         while(incompletePartitions.size() > 0) {
             this.runSet();
         }
     }
     
+    @Override
     public void runSet() {        
         logger.debug("Processing " + incompletePartitions.size() + " partitions");
         Collection<Partition> newPartitionSet = new ArrayList<Partition>();
@@ -67,7 +71,7 @@ public class SimpleProcessor {
         incompletePartitions = newPartitionSet;
     }
     
-    public Collection<Partition> splitPartition(Partition partition) {
+    private Collection<Partition> splitPartition(Partition partition) {
 //        logger.debug("Splitting partition with combination: " + partition.printElements() + " with split index: " + partition.getSplitIndex());
         
         Collection<Partition> newPartitions = new ArrayList<Partition>();

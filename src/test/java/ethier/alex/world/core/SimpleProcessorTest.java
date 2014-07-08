@@ -8,6 +8,7 @@ import com.google.common.base.Stopwatch;
 import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
+import ethier.alex.world.core.processor.Processor;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import ethier.alex.world.query.Wizard;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class SimpleProcessorTest {
                 .addFilter(filter4)
                 .getPartition();
         
-        SimpleProcessor simpleProcessor = new SimpleProcessor(rootPartition);
+        Processor simpleProcessor = new SimpleProcessor(rootPartition);
         
         simpleProcessor.runAll();
         
@@ -154,10 +155,10 @@ public class SimpleProcessorTest {
             //Note the complement is a great way to determine the efficiency of the algorithm.
 
 
-//            int ones = 8;
-//            int worldLength = 16;
-            int ones = 2;
-            int worldLength = 4;
+//            int ones = 10;
+//            int worldLength = 20;
+            int ones = 3;
+            int worldLength = 6;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
@@ -194,7 +195,7 @@ public class SimpleProcessorTest {
                     .addFilters(filters)
                     .getPartition();
 
-            SimpleProcessor processor = new SimpleProcessor(rootPartition);
+            Processor processor = new SimpleProcessor(rootPartition);
             Stopwatch stopWatch =  Stopwatch.createStarted();
             processor.runAll();
             stopWatch.stop();
@@ -216,7 +217,7 @@ public class SimpleProcessorTest {
 
             Set<String> outputSet = new HashSet<String>();
             for(ElementList origList : originalCombinations) {
-                logger.debug(origList);
+//                logger.debug(origList);
                 
                 String enumStr = origList.toString();
                 int numOnes = StringUtils.countMatches(enumStr, "1");
