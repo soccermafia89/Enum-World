@@ -10,7 +10,7 @@ import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import ethier.alex.world.core.processor.Processor;
 import ethier.alex.world.core.processor.SimpleProcessor;
-import ethier.alex.world.query.Wizard;
+import ethier.alex.world.query.SimpleQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -124,7 +124,7 @@ public class SimpleProcessorTest {
         filterQueries3.add(filter1query3);
         filterQueries3.add(filter2query3);
         
-        Wizard query = new Wizard(radices, finalElements);
+        SimpleQuery query = new SimpleQuery(radices, finalElements);
         System.out.println("World Size: " + query.getWorldSize());
         
         double queryResult1 = query.query(filter1query1);
