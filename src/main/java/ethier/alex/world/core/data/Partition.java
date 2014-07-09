@@ -171,17 +171,18 @@ public class Partition implements Writable {
         int numFilters = filters.size();
         out.writeInt(numFilters);
 
-        for (FilterList filter : filters) {
-            int[] ordinals = filter.getOrdinals();
-
-            for (int i = 0; i < ordinals.length; i++) {
-                out.writeInt(ordinals[i]);
-            }
-
-            FilterState[] filterStates = filter.getFilterStates();
-            for (int i = 0; i < filterStates.length; i++) {
-                out.writeUTF(filterStates[i].name());
-            }
+        for (Writable filterListWritable : filters) {
+//            int[] ordinals = filter.getOrdinals();
+//
+//            for (int i = 0; i < ordinals.length; i++) {
+//                out.writeInt(ordinals[i]);
+//            }
+//
+//            FilterState[] filterStates = filter.getFilterStates();
+//            for (int i = 0; i < filterStates.length; i++) {
+//                out.writeUTF(filterStates[i].name());
+//            }
+            filterListWritable.write(out);
         }
     }
 
@@ -190,23 +191,24 @@ public class Partition implements Writable {
 
         Collection<FilterList> readFilters = new ArrayList<FilterList>();
         for (int i = 0; i < numFilters; i++) {
-            FilterListBuilder filterListBuilder = FilterListBuilder.newInstance();
-
-            int[] ordinals = new int[radices.length];
-            for (int j = 0; j < radices.length; j++) {
-                ordinals[j] = in.readInt();
-            }
-
-            filterListBuilder.setOrdinals(ordinals);
-
-            FilterState[] filterStates = new FilterState[radices.length];
-            for (int j = 0; j < radices.length; j++) {
-                filterStates[j] = FilterState.valueOf(in.readUTF());
-            }
-
-            filterListBuilder.setFilterStates(filterStates);
-
-            readFilters.add(filterListBuilder.getFilterList());
+//            FilterListBuilder filterListBuilder = FilterListBuilder.newInstance();
+//
+//            int[] ordinals = new int[radices.length];
+//            for (int j = 0; j < radices.length; j++) {
+//                ordinals[j] = in.readInt();
+//            }
+//
+//            filterListBuilder.setOrdinals(ordinals);
+//
+//            FilterState[] filterStates = new FilterState[radices.length];
+//            for (int j = 0; j < radices.length; j++) {
+//                filterStates[j] = FilterState.valueOf(in.readUTF());
+//            }
+//
+//            filterListBuilder.setFilterStates(filterStates);
+//
+//            readFilters.add(filterListBuilder.getFilterList());
+            readFilters.add(new FilterList(in));
         }
 
         return readFilters;

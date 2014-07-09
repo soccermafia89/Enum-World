@@ -4,7 +4,14 @@
  */
 package ethier.alex.world.core.data;
 
-import java.util.*;
+import ethier.alex.world.addon.FilterListBuilder;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -12,12 +19,24 @@ import org.apache.log4j.Logger;
  @author alex
  */
 // Wraps an Numeral[] as a class
-public class FilterList {
+public class FilterList implements Writable {
 
     private static Logger logger = Logger.getLogger(FilterList.class);
     private Set<Integer> unmatchedFilterIndex;
     private Filter[] filters;
 //    private Filter[] filterElements;
+    
+    public FilterList(DataInput in) throws IOException {
+        this.readFields(in);
+        
+        unmatchedFilterIndex = new HashSet<Integer>();
+
+        for (int i = 0; i < filters.length; i++) {
+            if (filters[i].getFilterState() != FilterState.ALL) {
+                unmatchedFilterIndex.add(i);
+            }
+        }
+    }
 
     public FilterList(Filter[] myFilterElements) {
         unmatchedFilterIndex = new HashSet<Integer>();
@@ -152,5 +171,55 @@ public class FilterList {
         }
         
         return Arrays.toString(copy);
+    }
+
+    @Override
+    public void write(DataOutput out) throws IOException {
+        this.writeWorldSize(out);
+        this.writeFilters(out);
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        this.readWorldSize(in);
+        filters = this.readFilters(in).filters;
+    }
+    
+    private void writeWorldSize(DataOutput out) throws IOException {
+        out.writeInt(filters.length);
+    }
+
+    private void readWorldSize(DataInput in) throws IOException {
+        int worldSize = in.readInt();
+        filters = new Filter[worldSize];
+    }
+    
+    private void writeFilters(DataOutput out) throws IOException {
+        for (int i = 0; i < filters.length; i++) {
+            out.writeInt(filters[i].getOrdinal());
+        }
+
+        for (int i = 0; i < filters.length; i++) {
+            out.writeUTF(filters[i].getFilterState().name());
+        }
+    }
+    
+    private FilterList readFilters(DataInput in) throws IOException {
+        FilterListBuilder filterListBuilder = FilterListBuilder.newInstance();
+
+        int[] ordinals = new int[filters.length];
+        for (int j = 0; j < filters.length; j++) {
+            ordinals[j] = in.readInt();
+        }
+
+        filterListBuilder.setOrdinals(ordinals);
+
+        FilterState[] filterStates = new FilterState[filters.length];
+        for (int j = 0; j < filters.length; j++) {
+            filterStates[j] = FilterState.valueOf(in.readUTF());
+        }
+
+        filterListBuilder.setFilterStates(filterStates);
+        return filterListBuilder.getFilterList();
     }
 }
