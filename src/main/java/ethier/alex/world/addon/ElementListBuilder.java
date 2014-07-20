@@ -4,8 +4,9 @@
  */
 package ethier.alex.world.addon;
 
-import ethier.alex.world.core.data.*;
-import java.util.Iterator;
+import ethier.alex.world.core.data.Element;
+import ethier.alex.world.core.data.ElementList;
+import ethier.alex.world.core.data.ElementState;
 import org.apache.log4j.Logger;
 
 /**

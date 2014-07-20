@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -105,6 +106,12 @@ public class Partition implements Writable {
         }
         return true;
     }
+    
+    /**
+    
+    Writable serialization methods
+    
+    **/
 
     @Override
     public void write(DataOutput out) throws IOException {
@@ -172,16 +179,6 @@ public class Partition implements Writable {
         out.writeInt(numFilters);
 
         for (Writable filterListWritable : filters) {
-//            int[] ordinals = filter.getOrdinals();
-//
-//            for (int i = 0; i < ordinals.length; i++) {
-//                out.writeInt(ordinals[i]);
-//            }
-//
-//            FilterState[] filterStates = filter.getFilterStates();
-//            for (int i = 0; i < filterStates.length; i++) {
-//                out.writeUTF(filterStates[i].name());
-//            }
             filterListWritable.write(out);
         }
     }
@@ -191,26 +188,44 @@ public class Partition implements Writable {
 
         Collection<FilterList> readFilters = new ArrayList<FilterList>();
         for (int i = 0; i < numFilters; i++) {
-//            FilterListBuilder filterListBuilder = FilterListBuilder.newInstance();
-//
-//            int[] ordinals = new int[radices.length];
-//            for (int j = 0; j < radices.length; j++) {
-//                ordinals[j] = in.readInt();
-//            }
-//
-//            filterListBuilder.setOrdinals(ordinals);
-//
-//            FilterState[] filterStates = new FilterState[radices.length];
-//            for (int j = 0; j < radices.length; j++) {
-//                filterStates[j] = FilterState.valueOf(in.readUTF());
-//            }
-//
-//            filterListBuilder.setFilterStates(filterStates);
-//
-//            readFilters.add(filterListBuilder.getFilterList());
             readFilters.add(new FilterList(in));
         }
 
         return readFilters;
+    }
+    
+    /**
+    
+    Writable serialization methods end
+    
+    **/
+    
+    /**
+    
+    Additional helper methods.
+    
+    **/
+    
+    public static String serializeRadices(int[] myRadices) {
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        for(int i=0; i < myRadices.length; i++) {
+            int radix = myRadices[i];
+            stringBuilder.append(radix);
+            stringBuilder.append(",");
+        }
+        
+        return StringUtils.stripEnd(stringBuilder.toString(), ",");
+    }
+    
+    public static int[] deserializeRadices(String serializedRadices) {
+        String[] intStrs = serializedRadices.split(",");
+        int[] myRadices = new int[intStrs.length];
+        for(int i=0; i < intStrs.length; i++) {
+            myRadices[i] = Integer.parseInt(intStrs[i]);
+        }
+        
+        return myRadices;
     }
 }

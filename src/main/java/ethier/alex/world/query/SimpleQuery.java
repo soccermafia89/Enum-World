@@ -5,15 +5,12 @@
 package ethier.alex.world.query;
 
 import ethier.alex.world.core.data.*;
-import ethier.alex.world.core.processor.SimpleProcessor;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -48,16 +45,19 @@ public class SimpleQuery implements Query {
 
     }
 
-    public long getWorldSize() {
-        return worldSize.longValueExact();
+    @Override
+    public BigDecimal getWorldSize() {
+        return worldSize;
     }
 
+    @Override
     public double query(FilterList filter) {
         Collection<FilterList> filters = new ArrayList<FilterList>();
         filters.add(filter);
         return query(filters);
     }
 
+    @Override
     public double query(Collection<FilterList> filters) {
         BigDecimal score = BigDecimal.valueOf(0L);
 

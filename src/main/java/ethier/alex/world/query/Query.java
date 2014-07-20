@@ -5,6 +5,7 @@
 package ethier.alex.world.query;
 
 import ethier.alex.world.core.data.FilterList;
+import java.math.BigDecimal;
 import java.util.Collection;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Collection;
  */
 public interface Query {
     
-    public long getWorldSize();
+    public BigDecimal getWorldSize();
     
     public double query(FilterList filter);
     

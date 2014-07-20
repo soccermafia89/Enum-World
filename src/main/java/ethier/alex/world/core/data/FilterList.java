@@ -4,14 +4,11 @@
  */
 package ethier.alex.world.core.data;
 
+import ethier.alex.world.addon.CollectionByteSerializer;
 import ethier.alex.world.addon.FilterListBuilder;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
+import org.apache.commons.codec.DecoderException;
 import org.apache.log4j.Logger;
 
 /**
@@ -172,7 +169,13 @@ public class FilterList implements Writable {
         
         return Arrays.toString(copy);
     }
-
+    
+    /**
+    
+    Writable serialization methods
+    
+    **/
+    
     @Override
     public void write(DataOutput out) throws IOException {
         this.writeWorldSize(out);
@@ -221,5 +224,46 @@ public class FilterList implements Writable {
 
         filterListBuilder.setFilterStates(filterStates);
         return filterListBuilder.getFilterList();
+    }
+    
+    /**
+    
+    Writable serialization methods end
+    
+    **/
+    
+    /**
+    
+    Additional helper methods.
+    
+    **/
+    public static Collection<FilterList> deserializeFilters(String serializedFilters) throws IOException, DecoderException {
+
+        Collection<byte[]> bytes = CollectionByteSerializer.toBytes(serializedFilters);
+        Collection<FilterList> inputFilters = new ArrayList<FilterList>();
+        for (byte[] byteArray : bytes) {
+            ByteArrayInputStream bais = new ByteArrayInputStream(byteArray);
+            DataInput dataInput = new DataInputStream(bais);
+            FilterList filter = new FilterList(dataInput);
+            inputFilters.add(filter);
+        }
+
+        return inputFilters;
+    }
+    
+    public static String serializeFilters(Collection<FilterList> myFilters) throws IOException {
+
+        Collection<byte[]> byteCollection = new ArrayList<byte[]>();
+        for(FilterList filter : myFilters) {
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutput dataOutput = new DataOutputStream(baos);
+            filter.write(dataOutput);
+            byte[] serializedElementList = baos.toByteArray();
+            byteCollection.add(serializedElementList);
+        }
+
+        String serializedFilters = CollectionByteSerializer.toString(byteCollection);
+        return serializedFilters;
     }
 }
