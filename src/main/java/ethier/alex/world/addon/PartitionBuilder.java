@@ -83,11 +83,16 @@ public class PartitionBuilder {
     }
 
     public Partition getPartition() {
+        
+        if(radices == null) {
+            throw new RuntimeException("PartitionBuilder does not have valid radices set.");
+        }
 
         if (partition != null) {
             return partition;
         } else {
             if(isBlankWorld) {
+                
                 elements = ElementListBuilder.newInstance()
                         .setBlankWorld(radices.length)
                         .getElementList();
@@ -95,6 +100,8 @@ public class PartitionBuilder {
             
             if (elements == null) {
                 throw new RuntimeException("PartitionBuilder does not have valid elements list set.");
+            } else if(filters == null) {
+                throw new RuntimeException("PartitionBuilder does not have valid filters list set.");
             } else {
 
                 partition = new Partition(radices, elements, filters);
