@@ -9,6 +9,8 @@ import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,6 +24,7 @@ public class PartitionBuilder {
     private Collection<FilterList> filters;
     private ElementList elements;
     private int[] radices;
+//    private Set<Integer> checkedRadices;
     private boolean isBlankWorld = false;
 
     public static PartitionBuilder newInstance() {
@@ -32,13 +35,21 @@ public class PartitionBuilder {
         filters = new ArrayList();
     }
     
+//    public PartitionBuilder setCheckedRadices(Set<Integer> myCheckedRadices) {
+//        if (partition != null) {
+//            throw new RuntimeException("Partition already created.");
+//        }
+//        
+//        checkedRadices = myCheckedRadices;
+//        return this;
+//    }
+    
     public PartitionBuilder setElements(ElementList myElements) {
         if (partition != null) {
             throw new RuntimeException("Partition already created.");
         }
 
         elements = myElements;
-
         return this;
     }
 
@@ -103,7 +114,12 @@ public class PartitionBuilder {
             } else if(filters == null) {
                 throw new RuntimeException("PartitionBuilder does not have valid filters list set.");
             } else {
-
+                
+//                if(checkedRadices == null) {
+//                    checkedRadices = new HashSet<Integer>();
+//                }
+                
+//                partition = new Partition(radices, elements, filters, checkedRadices);
                 partition = new Partition(radices, elements, filters);
                 return partition;
             }

@@ -4,13 +4,12 @@
  */
 package ethier.alex.world.core.data;
 
-import ethier.alex.world.addon.FilterListBuilder;
+import com.google.common.collect.ImmutableSet;
+import ethier.alex.world.addon.ElementListBuilder;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -24,8 +23,8 @@ public class Partition implements Writable {
 
     ElementList elements;
     Collection<FilterList> filters;
-    private int splitIndex = -1;
     private int[] radices;
+//    private Set<Integer> checkedRadices; // Contains the radices offsets that have already been checked on.
     
     public Partition(DataInput in) throws IOException {
         this.readFields(in);
@@ -35,15 +34,24 @@ public class Partition implements Writable {
         elements = myElements;
         filters = myFilters;
         radices = myRadices;
-
-        for (int i = 0; i < elements.getLength(); i++) {
-
-            Element element = elements.getElement(i);
-            if (splitIndex < 0 && element.getElementState() == ElementState.UNSET) {
-                splitIndex = i;
-            }
-        }
+//        checkedRadices = new ImmutableSet.Builder<Integer>().addAll(myCheckedRadices).build();
     }
+    
+//    public Set<Integer> getCheckedRadices() {
+//        return checkedRadices;
+//    }
+//    
+//    public Set<Integer> getUncheckedRadices() {
+//        Set<Integer> uncheckedRadices = new HashSet<Integer>();
+//        
+//        for(int i=0; i < radices.length; i++) {
+//            if(!checkedRadices.contains(i)) {
+//                uncheckedRadices.add(i);
+//            }
+//        }
+//        
+//        return uncheckedRadices;
+//    }
     
     public int[] getRadices() {
         return radices;
@@ -57,35 +65,27 @@ public class Partition implements Writable {
         return elements;
     }
     
-    public int getSplitIndex() {
-        return splitIndex;
-    }
-    
-    public ElementList[] getSplits() {
-        int radix = radices[splitIndex];
+    public ElementList[] getSplits(int splitOffset) {
+//        logger.info("Splitting: " + elements + " at " + splitOffset);
+        
+        int radix = radices[splitOffset];
         
         ElementList[] elementSplits = new ElementList[radix];
         
         for(int i=0;i < radix;i++) {
-            ElementList newSplit = elements.copy();
             Element newElement = new Element(i);
-            newSplit.set(splitIndex, newElement);
             
-            elementSplits[i] = newSplit;
+            ElementList newSplit = ElementListBuilder.newInstance()
+                    .copy(elements)
+                    .setElement(splitOffset, newElement)
+                    .getElementList();
+                        
+            elementSplits[i] = newSplit;            
         }
         
         return elementSplits;
     }
 
-    public boolean hasSplit() {
-//        logger.info("elements: " + elements.toString());
-        if (splitIndex > -1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
     public String printElements() {
         StringBuilder stringBuilder = new StringBuilder();
         
@@ -98,15 +98,19 @@ public class Partition implements Writable {
         return stringBuilder.toString();
     }
     
-    public boolean verifyIntegrity() {
-        for(FilterList filter : filters) {
-            if(filter.checkMatch(elements) != Matches.PARTLY) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    public boolean verifyIntegrity() {
+//        for(FilterList filter : filters) {
+//            if(filter.checkMatch(elements) != Matches.PARTLY) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
     
+//    public void addCheckedRadix(int radix) {
+//        checkedRadices.add(radix);
+//    }
+//    
     /**
     
     Writable serialization methods
@@ -120,24 +124,17 @@ public class Partition implements Writable {
         writeRadices(out);
         writeElements(out);
         writeFilters(out);
+//        writeCheckedRadices(out);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
 
         this.readWorldSize(in);
-
         radices = readRadices(in);
         elements = readElementList(in);
         filters = readFilters(in);
-        
-        for (int i = 0; i < elements.getLength(); i++) {
-
-            Element element = elements.getElement(i);
-            if (splitIndex < 0 && element.getElementState() == ElementState.UNSET) {
-                splitIndex = i;
-            }
-        }
+//        checkedRadices = readCheckedRadices(in);
     }
 
     private void writeWorldSize(DataOutput out) throws IOException {
@@ -193,6 +190,26 @@ public class Partition implements Writable {
 
         return readFilters;
     }
+    
+//    private void writeCheckedRadices(DataOutput out) throws IOException {
+//        int numberCheckedRadices = checkedRadices.size();
+//        out.writeInt(numberCheckedRadices);
+//        
+//        for(Integer checkedRadix : checkedRadices) {
+//            out.writeInt(checkedRadix);
+//        }
+//    }
+    
+//    private Set<Integer> readCheckedRadices(DataInput in) throws IOException {
+//        Set<Integer> inCheckedRadices = new HashSet<Integer>();
+//        int numberCheckedRadices = in.readInt();
+//        
+//        for(int i=0; i < numberCheckedRadices; i++) {
+//            inCheckedRadices.add(in.readInt());
+//        }
+//        
+//        return inCheckedRadices;
+//    }
     
     /**
     

@@ -10,6 +10,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -55,14 +56,53 @@ public class ElementList implements Iterable, Writable {
     public Element getElement(int i) {
         return elementArray[i];
     }
-
-    public ElementList copy() {
-        Element[] newElementArray = Arrays.copyOf(elementArray, elementArray.length);
-        return new ElementList(newElementArray);
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null || !(obj instanceof ElementList)) {
+            return false;
+        } else {
+            ElementList otherElementList = (ElementList) obj;
+            Element[] otherElements = otherElementList.elementArray;
+            
+            if(otherElements.length != elementArray.length) {
+                return false;
+            } else {
+                for(int i=0; i< otherElements.length; i++) {
+                    ElementState otherElementState = otherElements[i].getElementState();
+                    ElementState elementState = elementArray[i].getElementState();
+                    
+                    if(otherElementState != elementState) {
+                        return false;
+                    }
+                    
+                    if(elementState == ElementState.SET) {
+                        int otherOrdinal = otherElements[i].getOrdinal();
+                        int ordinal = elementArray[i].getOrdinal();
+                        
+                        if(ordinal != otherOrdinal) {
+                            return false;
+                        }
+                    }
+                }
+                
+                return true;
+            }
+        }        
     }
-
-    public void set(int i, Element element) {
-        elementArray[i] = element;
+    
+    @Override
+    public int hashCode() {
+        HashCodeBuilder hasher = new HashCodeBuilder(17, 17);
+        
+        for(Element element : elementArray) {
+            hasher.append(element.getElementState().comparator());
+            if(element.getElementState() == ElementState.SET) {
+                hasher.append(element.getOrdinal());
+            }
+        }
+        
+        return hasher.toHashCode();
     }
 
     @Override
