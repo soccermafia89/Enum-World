@@ -153,8 +153,8 @@ public class SimpleProcessorTest {
 
 //            int ones = 10;
 //            int worldLength = 20;
-            int ones = 7;
-            int worldLength = 14;
+            int ones = 5;
+            int worldLength = 10;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
