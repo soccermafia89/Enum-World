@@ -59,7 +59,7 @@ public class FilterListBuilder {
                 if (charchar == '*') {
                     myOrdinals[i] = -1;
                 } else {
-                    myOrdinals[i] = Character.getNumericValue(charchar);;
+                    myOrdinals[i] = Character.getNumericValue(charchar);
                 }
             }
         }

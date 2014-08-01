@@ -48,26 +48,28 @@ public class SimpleProcessorTest {
         System.out.println("");
         System.out.println(""); 
         
-        int[] radices = new int[4];
+        int[] radices = new int[6];
         radices[0] = 3;
         radices[1] = 2;
         radices[2] = 3;
         radices[3] = 2;
+        radices[4] = 5;
+        radices[5] = 5;
         
         FilterList filter1 = FilterListBuilder.newInstance()
-                .setOrdinals(new int[] {0, -1, -1, -1})
+                .setQuick("0*****")
                 .getFilterList();
         
         FilterList filter2 = FilterListBuilder.newInstance()
-                .setOrdinals(new int[] {-1, -1, 1, -1})
+                .setQuick("**1***")
                 .getFilterList();
         
         FilterList filter3 = FilterListBuilder.newInstance()
-                .setOrdinals(new int[] {-1, -1, 0, -1})
+                .setQuick("**0***")
                 .getFilterList();
         
         FilterList filter4 = FilterListBuilder.newInstance()
-                .setOrdinals(new int[] {1, 1, 2, 0})
+                .setQuick("1120**")
                 .getFilterList();
         
         Partition rootPartition = PartitionBuilder
@@ -80,7 +82,8 @@ public class SimpleProcessorTest {
                 .addFilter(filter4)
                 .getPartition();
         
-        Processor simpleProcessor = new SimpleProcessor(rootPartition);
+        Processor simpleProcessor = new SimpleProcessor();
+        simpleProcessor.setPartition(rootPartition);
         
         simpleProcessor.runAll();
         
@@ -91,35 +94,25 @@ public class SimpleProcessorTest {
         
         
         FilterList filter1query1 = FilterListBuilder.newInstance()
-                .setQuick("**2*")
+                .setQuick("**2***")
                 .getFilterList();
-        
-//        FilterList filter1query2 = FilterListBuilder.newInstance()
-//                .setQuick("10**")
-//                .getFilterList();
-//        FilterList filter2query2 = FilterListBuilder.newInstance()
-//                .setQuick("2***")
-//                .getFilterList();
-//        Collection<FilterList> query2 = new ArrayList();
-//        query2.add(filter1query2);
-//        query2.add(filter2query2);
         
         Collection<FilterList> filterQueries2 = new ArrayList<FilterList>();
         FilterList filter1query2 = FilterListBuilder.newInstance()
-    		  .setQuick("*0**")
+    		  .setQuick("1*****")
     		  .getFilterList();
         FilterList filter2query2 = FilterListBuilder.newInstance()
-    		  .setQuick("*1**")
+    		  .setQuick("2*****")
     		  .getFilterList();
         filterQueries2.add(filter1query2);
         filterQueries2.add(filter2query2);
         
         Collection<FilterList> filterQueries3 = new ArrayList<FilterList>();
         FilterList filter1query3 = FilterListBuilder.newInstance()
-    		  .setQuick("10**")
+    		  .setQuick("10****")
     		  .getFilterList();
         FilterList filter2query3 = FilterListBuilder.newInstance()
-    		  .setQuick("1**1")
+    		  .setQuick("2**1**")
     		  .getFilterList();
         filterQueries3.add(filter1query3);
         filterQueries3.add(filter2query3);
@@ -133,8 +126,11 @@ public class SimpleProcessorTest {
         double queryResult2 = query.query(filterQueries2);
         Assert.assertTrue(queryResult2 == 1.0);
         
+        System.out.println("Running query 3.");
+        System.out.println("");
         double queryResult3 = query.query(filterQueries3);
-        Assert.assertTrue(TestUtils.compareDoubles(queryResult3, (3.0 / 7.0), 0.000001));
+        System.out.println("Query Result 3: " + queryResult3);
+        Assert.assertTrue(TestUtils.compareDoubles(queryResult3, (4.0 / 7.0), 0.000001));
 
     }
     
@@ -157,8 +153,8 @@ public class SimpleProcessorTest {
 
 //            int ones = 10;
 //            int worldLength = 20;
-            int ones = 3;
-            int worldLength = 6;
+            int ones = 7;
+            int worldLength = 14;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
@@ -195,7 +191,8 @@ public class SimpleProcessorTest {
                     .addFilters(filters)
                     .getPartition();
 
-            Processor processor = new SimpleProcessor(rootPartition);
+            Processor processor = new SimpleProcessor();
+            processor.setPartition(rootPartition);
             Stopwatch stopWatch =  Stopwatch.createStarted();
             processor.runAll();
             stopWatch.stop();
@@ -209,7 +206,8 @@ public class SimpleProcessorTest {
                     .addFilters(complementFilters)
                     .getPartition();
 
-            processor = new SimpleProcessor(complementPartition);
+            processor.reset();
+            processor.setPartition(complementPartition);
             stopWatch.start();
             processor.runAll();
             stopWatch.stop();
@@ -217,7 +215,6 @@ public class SimpleProcessorTest {
 
             Set<String> outputSet = new HashSet<String>();
             for(ElementList origList : originalCombinations) {
-//                logger.debug(origList);
                 
                 String enumStr = origList.toString();
                 int numOnes = StringUtils.countMatches(enumStr, "1");

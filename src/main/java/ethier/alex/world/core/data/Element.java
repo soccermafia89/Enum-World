@@ -22,7 +22,7 @@ public class Element implements Numeral {
         }
 
         elementState = (ElementState)myElementState;
-        // The ordinal doesn't matter if the element state is 'ALL' 
+        ordinal = elementState.comparator();
     }
 
     public Element(int myOrdinal) {

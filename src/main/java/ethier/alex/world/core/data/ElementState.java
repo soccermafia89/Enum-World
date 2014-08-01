@@ -13,10 +13,11 @@ public enum ElementState {
     
     private int comparator;
     
+    // Comparator states should be negative to not conflict with possible ordinal numbers
     static {
-        SET.comparator = 0;
-        UNSET.comparator = 1;
-        ALL.comparator = 2; 
+        SET.comparator = -1;
+        UNSET.comparator = -2;
+        ALL.comparator = -3; 
     }
     
     public int comparator() {

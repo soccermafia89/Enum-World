@@ -13,10 +13,11 @@ public enum FilterState {
     ALL, ONE;
     
     private int comparator;
-
+    
+    // Should be synchronized with ElementState class.
     static {
-        ALL.comparator = 2;
-        ONE.comparator = 3;
+        ALL.comparator = -2;
+        ONE.comparator = -3;
     }
 
     public int comparator() {

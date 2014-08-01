@@ -4,14 +4,14 @@
     <groupId>ethier.alex</groupId>
     <artifactId>enum-world</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <name>Enum World</name>
     
     <scm>
         <connection>scm:git:ssh://git@github.com:soccermafia89/Enum-World.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/soccermafia89/Enum-World.git</developerConnection>
         <url>https://github.com/soccermafia89/Enum-World</url>
-        <tag>enum-world-1.0.0</tag>
+        <tag>enum-world-3.0.0</tag>
     </scm>
 
     <dependencies>    
