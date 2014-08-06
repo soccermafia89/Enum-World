@@ -13,7 +13,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -21,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class SimpleQuery implements Query {
 
-    private static Logger logger = Logger.getLogger(SimpleQuery.class);
+    private static Logger logger = LogManager.getLogger(SimpleQuery.class);
     Collection<ElementList> elements;
     int[] radices;
     BigDecimal worldSize;
@@ -92,7 +93,7 @@ public class SimpleQuery implements Query {
             
             partitions.add(queryPartition);
             
-            logger.info("Adding query partition: " + queryPartition.printElements());
+            logger.info("Adding query partition: {}", queryPartition.printElements());
         }
         
         Processor processor = new SimpleProcessor();
@@ -101,7 +102,7 @@ public class SimpleQuery implements Query {
         processor.runAll();
         
         BigDecimal newWorldSize = this.computeWorldSize(processor.getCompletedPartitions());
-        logger.info("Query new world size: " + newWorldSize);
+        logger.info("Query new world size: {}", newWorldSize);
         BigDecimal score = (worldSize.subtract(newWorldSize)).divide(worldSize, 10, RoundingMode.UP);
         return score.doubleValue();
         

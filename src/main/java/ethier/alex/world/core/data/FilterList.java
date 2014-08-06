@@ -9,7 +9,8 @@ import ethier.alex.world.addon.FilterListBuilder;
 import java.io.*;
 import java.util.*;
 import org.apache.commons.codec.DecoderException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -18,31 +19,14 @@ import org.apache.log4j.Logger;
 // Wraps an Numeral[] as a class
 public class FilterList implements Writable {
 
-    private static Logger logger = Logger.getLogger(FilterList.class);
-//    private Set<Integer> unmatchedFilterIndex;
+    private static Logger logger = LogManager.getLogger(FilterList.class);
     private Filter[] filters;
-//    private Filter[] filterElements;
     
     public FilterList(DataInput in) throws IOException {
         this.readFields(in);
-        
-//        unmatchedFilterIndex = new HashSet<Integer>();
-//
-//        for (int i = 0; i < filters.length; i++) {
-//            if (filters[i].getFilterState() != FilterState.ALL) {
-//                unmatchedFilterIndex.add(i);
-//            }
-//        }
     }
 
     public FilterList(Filter[] myFilterElements) {
-//        unmatchedFilterIndex = new HashSet<Integer>();
-//
-//        for (int i = 0; i < myFilterElements.length; i++) {
-//            if (myFilterElements[i].getFilterState() != FilterState.ALL) {
-//                unmatchedFilterIndex.add(i);
-//            }
-//        }
 
         filters = myFilterElements;
     }

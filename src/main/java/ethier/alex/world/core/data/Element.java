@@ -4,7 +4,9 @@
  */
 package ethier.alex.world.core.data;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
 
@@ -12,7 +14,7 @@ import org.apache.log4j.Logger;
  */
 public class Element implements Numeral {
 
-    private static Logger logger = Logger.getLogger(Element.class);
+    private static Logger logger = LogManager.getLogger(Element.class);
     private ElementState elementState;
     private int ordinal; // The ordinal value.
 

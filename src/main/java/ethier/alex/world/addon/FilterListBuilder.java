@@ -6,7 +6,8 @@ package ethier.alex.world.addon;
 
 import ethier.alex.world.core.data.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class FilterListBuilder {
 
-    private static Logger logger = Logger.getLogger(FilterListBuilder.class);
+    private static Logger logger = LogManager.getLogger(FilterListBuilder.class);
     private FilterList filterArray;
     private int[] ordinals;
     private FilterState[] filterStates;

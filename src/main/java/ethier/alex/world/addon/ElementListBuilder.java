@@ -7,9 +7,9 @@ package ethier.alex.world.addon;
 import ethier.alex.world.core.data.Element;
 import ethier.alex.world.core.data.ElementList;
 import ethier.alex.world.core.data.ElementState;
-import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 public class ElementListBuilder {
 
-    private static Logger logger = Logger.getLogger(ElementListBuilder.class);
+    private static Logger logger = LogManager.getLogger(ElementListBuilder.class);
     private ElementList elements;
     private int[] ordinals;
     private ElementState[] elementStates;
@@ -47,16 +47,9 @@ public class ElementListBuilder {
         if (elements != null) {
             throw new RuntimeException("NumeralArray already created.");
         }
-//        
-//        logger.info("Setting element at: " + i);
-//        logger.info("Before Ordinals: " + Arrays.toString(ordinals));
-//        logger.info("Before States: " + Arrays.toString(elementStates));
         
         ordinals[i] = element.getOrdinal();
         elementStates[i] = element.getElementState();
-//        
-//        logger.info("After Ordinals: " + Arrays.toString(ordinals));
-//        logger.info("After States: " + Arrays.toString(elementStates));
         
         return this;
     }

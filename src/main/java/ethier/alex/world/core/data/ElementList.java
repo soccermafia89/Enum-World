@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -20,7 +21,7 @@ import org.apache.log4j.Logger;
 // Wraps an Numeral[] as a class
 public class ElementList implements Iterable, Writable {
 
-    private static Logger logger = Logger.getLogger(ElementList.class);
+    private static Logger logger = LogManager.getLogger(ElementList.class);
     private Element[] elementArray;
     
     public ElementList(DataInput in) throws IOException {

@@ -9,9 +9,8 @@ import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -19,7 +18,7 @@ import org.apache.log4j.Logger;
  */
 public class PartitionBuilder {
 
-    private static Logger logger = Logger.getLogger(PartitionBuilder.class);
+    private static Logger logger = LogManager.getLogger(PartitionBuilder.class);
     private Partition partition;
     private Collection<FilterList> filters;
     private ElementList elements;
@@ -34,15 +33,6 @@ public class PartitionBuilder {
     public PartitionBuilder() {
         filters = new ArrayList();
     }
-    
-//    public PartitionBuilder setCheckedRadices(Set<Integer> myCheckedRadices) {
-//        if (partition != null) {
-//            throw new RuntimeException("Partition already created.");
-//        }
-//        
-//        checkedRadices = myCheckedRadices;
-//        return this;
-//    }
     
     public PartitionBuilder setElements(ElementList myElements) {
         if (partition != null) {

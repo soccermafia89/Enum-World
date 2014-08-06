@@ -8,7 +8,8 @@ import ethier.alex.world.addon.ElementListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
 
@@ -16,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 public class SimpleProcessor implements Processor {
     
-    private static Logger logger = Logger.getLogger(SimpleProcessor.class);
+    private static Logger logger = LogManager.getLogger(SimpleProcessor.class);
     
     private Collection<Partition> incompletePartitions;
     private Collection<ElementList> finalCombinations;
@@ -45,7 +46,7 @@ public class SimpleProcessor implements Processor {
     
     @Override
     public void runAll() {
-        while(incompletePartitions.size() > 0) {
+        while(!incompletePartitions.isEmpty()) {
             this.runSet();
         }
     }
@@ -54,7 +55,7 @@ public class SimpleProcessor implements Processor {
     public void runSet() {    
         
         logger.info("");
-        logger.info("Processing set with " + incompletePartitions.size() + " partitions");
+        logger.info("Processing set with {} partitions", incompletePartitions.size());
 
 //        List<Integer> uncheckedRadices = new ArrayList<Integer>();
         Collection<Partition> newPartitionSet = new ArrayList<Partition>();
@@ -74,7 +75,7 @@ public class SimpleProcessor implements Processor {
                     }
                 }
                 
-                logger.info("Final combination found: " + elementsCopy.getElementList());
+                logger.info("Final combination found: {}", elementsCopy.getElementList());
                 finalCombinations.add(elementsCopy.getElementList());                
             } else {
 //                List<Integer> uncheckedRadices = new ArrayList<Integer>();
@@ -134,7 +135,7 @@ public class SimpleProcessor implements Processor {
                 
                 allBothFilters = false;
             } else {
-                throw new RuntimeException("Invalid state, filterBit: " + filterElement + " should have correct FilterElementState.");
+                throw new RuntimeException("Invalid state, filterBit: {} should have correct FilterElementState." + filterElement);
             }
         }
 
@@ -155,7 +156,7 @@ public class SimpleProcessor implements Processor {
                     .addFilters(filterSplits[0])
                     .getPartition();
 
-            logger.info("New partition added: " + allPartition.printElements());
+            logger.info("New partition added: {}", allPartition.printElements());
             newPartitions.add(allPartition);
 
         } else {
@@ -170,7 +171,7 @@ public class SimpleProcessor implements Processor {
                         .addFilters(filterCollection)
                         .getPartition();
 
-                logger.info("New partition added: " + splitPartition.printElements());
+                logger.info("New partition added: {}", splitPartition.printElements());
                 newPartitions.add(splitPartition);
             }
         }
@@ -324,7 +325,7 @@ public class SimpleProcessor implements Processor {
         incompletePartitions = conformedPartitions;
         
         for(Partition partition: incompletePartitions) {
-            logger.info("Conformed partition: " + partition.printElements());
+            logger.info("Conformed partition: {}", partition.printElements());
             
             SortedSet<Integer> uncheckedRadicesSet = this.buildUncheckedRadicesSet(partition);
             uncheckedRadicesMap.put(partition.getElements(), uncheckedRadicesSet);
