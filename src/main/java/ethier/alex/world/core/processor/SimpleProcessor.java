@@ -15,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 
  @author alex
  */
+
+//TODO: Create an abstract class: base processor instead of extending this class.
 public class SimpleProcessor implements Processor {
     
     protected static Logger logger = LogManager.getLogger(SimpleProcessor.class);
@@ -168,37 +170,51 @@ public class SimpleProcessor implements Processor {
                         .setElements(splitCombination)
                         .addFilters(filterCollection)
                         .getPartition();
-
-                logger.trace("New partition added: {}", splitPartition.printElements());
-                newPartitions.add(splitPartition);
+                
+                // Rather than continuing to split partitions, we should check to see if any filters already match
+                // This way we can remove partitions early.
+                if(!matchExists(splitPartition, uncheckedRadicesMap.get(partition.getElements()))) {
+                    logger.trace("New partition added: {}", splitPartition.printElements());
+                    newPartitions.add(splitPartition);
+                } 
+//                else {
+//                    logger.info("Match pre-filtered: {}", splitPartition.printElements());
+//                }
             }
         }
 
         return newPartitions;
     }
     
-//    private boolean matchExists(Partition partition) {
-//        
-//        if(partition == null) {
-//            logger.error("Passed in partition is null!");
-//        }
-//        
-//        if(partition.getFilters() == null) {
-//            logger.error("Partiton filters is null!");
-//        }
-//        
-//        ElementList combination = partition.getElements();
-//        
-//        for(FilterList filter : partition.getFilters()) {
-//            Matches matchOutcome = filter.applyMatch(combination);
-//            
-//            if(matchOutcome == Matches.ENTIRELY) {
-//                return true;
-//            }
-//        }
-//        
-//        return false;
-//    }
+    // TODO: Create a new uncheckedRadicesMap that uses both the elementList and Filter list as the key
+    // This will prevent duplicate checks.
+    private boolean matchExists(Partition partition, Collection<Integer> uncheckedRadices) {
+        
+        ElementList elements = partition.getElements();
+        
+        FilterLoop:
+        for(FilterList filterList : partition.getFilters()) {
+            boolean matches = true;
+            
+            for(int uncheckedRadix : uncheckedRadices) {
+                Element element = elements.getElement(uncheckedRadix);
+                Filter filter = filterList.getFilter(uncheckedRadix);
+                
+                if(filter.getFilterState() == FilterState.ALL) {
+                    continue;
+                } else if(element.getOrdinal() != filter.getOrdinal()) {
+                    matches = false;
+                    break;
+                }
+            }
+            
+            if(matches) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
 
     @Override
     public void importPartitions(PartitionExport partitionExport) {

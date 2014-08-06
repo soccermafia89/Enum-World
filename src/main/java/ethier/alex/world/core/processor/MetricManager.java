@@ -89,6 +89,7 @@ public class MetricManager {
         if(totalTime == 0) {
             processedPartitionsPerSecond = Integer.MAX_VALUE;
         } else {
+            // The assumption that all queued partitions are processed in a set leads to errors in Deep Processor.
             processedPartitionsPerSecond = (int) (1000 * averageQueuedPartitions / totalTime);
         }
         

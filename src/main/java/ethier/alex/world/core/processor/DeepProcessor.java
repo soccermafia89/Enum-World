@@ -16,7 +16,11 @@ import org.apache.logging.log4j.Logger;
  @author alex
  */
 
-// Stores incomplete partitions as a stack.
+/* 
+Stores incomplete partitions as a stack.  
+This means computing final partitions immediately, freeing up memory and returning existing solutions faster.
+Net processing time is also decreased dramatically.
+*/
 public class DeepProcessor extends SimpleProcessor implements Processor {
     
     private static Logger logger = LogManager.getLogger(DeepProcessor.class);

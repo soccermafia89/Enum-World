@@ -93,7 +93,7 @@ public class SimpleQuery implements Query {
             
             partitions.add(queryPartition);
             
-            logger.info("Adding query partition: {}", queryPartition.printElements());
+            logger.trace("Adding query partition: {}", queryPartition.printElements());
         }
         
         Processor processor = new SimpleProcessor();
