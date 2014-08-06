@@ -17,17 +17,13 @@ import org.apache.logging.log4j.Logger;
  */
 public class SimpleProcessor implements Processor {
     
-    private static Logger logger = LogManager.getLogger(SimpleProcessor.class);
+    protected static Logger logger = LogManager.getLogger(SimpleProcessor.class);
     
-    private Collection<Partition> incompletePartitions;
-    private Collection<ElementList> finalCombinations;
-    
-//    private TreeMultimap<ElementList, Integer> checkedRadices;
-    private Map<ElementList, SortedSet<Integer>> uncheckedRadicesMap;
+    protected Collection<Partition> incompletePartitions;
+    protected Collection<ElementList> finalCombinations;
+    protected Map<ElementList, SortedSet<Integer>> uncheckedRadicesMap;
     
     public SimpleProcessor() {
-//        HashMultimap.
-//        checkedRadices = TreeMultimap.create();
         uncheckedRadicesMap = new HashMap<ElementList, SortedSet<Integer>>();
         
         incompletePartitions = new ArrayList<Partition>();
@@ -54,63 +50,65 @@ public class SimpleProcessor implements Processor {
     @Override
     public void runSet() {    
         
-        logger.info("");
-        logger.info("Processing set with {} partitions", incompletePartitions.size());
+        logger.trace("");
+        logger.trace("Processing set with {} partitions", incompletePartitions.size());
 
-//        List<Integer> uncheckedRadices = new ArrayList<Integer>();
         Collection<Partition> newPartitionSet = new ArrayList<Partition>();
                 
         for(Partition partition : incompletePartitions) {
             
             if(partition.getFilters().isEmpty()) {
-                // Switch all UNSET elements to ALL
-                ElementList elements = partition.getElements();
-                ElementListBuilder elementsCopy = ElementListBuilder.newInstance().copy(elements);
-                for (int i = 0; i < elements.getLength(); i++) {
-
-                    Element element = partition.getElements().getElement(i);
-                    if (element.getElementState() == ElementState.UNSET)  {
-                        Element allElement = new Element(ElementState.ALL);
-                        elementsCopy.setElement(i, allElement);
-                    }
-                }
+                ElementList completedElementList = this.completePartition(partition);
                 
-                logger.info("Final combination found: {}", elementsCopy.getElementList());
-                finalCombinations.add(elementsCopy.getElementList());                
+                logger.trace("Final combination found: {}", completedElementList);
+                finalCombinations.add(completedElementList);                
             } else {
-//                List<Integer> uncheckedRadices = new ArrayList<Integer>();
-                SortedSet<Integer> uncheckedRadices = uncheckedRadicesMap.get(partition.getElements());
-                
-                if(!uncheckedRadices.isEmpty()) {
-                    int uncheckedRadix = uncheckedRadices.first();
-                    Collection<Partition> splitPartitions = this.splitPartition(partition, uncheckedRadix);
-                    
-                    SortedSet<Integer> newUncheckedRadices = new TreeSet<Integer>();
-                    newUncheckedRadices.addAll(uncheckedRadices);
-                    newUncheckedRadices.remove(uncheckedRadix);
-                    for(Partition splitPartition : splitPartitions) {
-                        uncheckedRadicesMap.put(splitPartition.getElements(), newUncheckedRadices);
-                    }
-                    
-                    newPartitionSet.addAll(splitPartitions); 
-                }
-                uncheckedRadicesMap.remove(partition.getElements());
+                newPartitionSet.addAll(this.computeNewPartitions(partition));
             }
         }
         
-//        logger.debug(newPartitionSet.size() + " new incomplete partitions created.");
         incompletePartitions = newPartitionSet;
     }
     
+    protected Collection<Partition> computeNewPartitions(Partition partition) {
+        SortedSet<Integer> uncheckedRadices = uncheckedRadicesMap.get(partition.getElements());
+        Collection<Partition> splitPartitions = new ArrayList<Partition>();       
+        
+        if(!uncheckedRadices.isEmpty()) {
+            int uncheckedRadix = uncheckedRadices.first();
+            splitPartitions = this.splitPartition(partition, uncheckedRadix);
+
+            SortedSet<Integer> newUncheckedRadices = new TreeSet<Integer>();
+            newUncheckedRadices.addAll(uncheckedRadices);
+            newUncheckedRadices.remove(uncheckedRadix);
+            for(Partition splitPartition : splitPartitions) {
+                uncheckedRadicesMap.put(splitPartition.getElements(), newUncheckedRadices);
+            }
+        }
+        uncheckedRadicesMap.remove(partition.getElements());
+        return splitPartitions;
+    }
+    
+    protected ElementList completePartition(Partition partition) {
+        // Switch all UNSET elements to ALL
+        ElementList elements = partition.getElements();
+        ElementListBuilder elementsCopy = ElementListBuilder.newInstance().copy(elements);
+        for (int i = 0; i < elements.getLength(); i++) {
+
+            Element element = partition.getElements().getElement(i);
+            if (element.getElementState() == ElementState.UNSET)  {
+                Element allElement = new Element(ElementState.ALL);
+                elementsCopy.setElement(i, allElement);
+            }
+        }
+        
+        return elementsCopy.getElementList();
+    } 
+    
     private Collection<Partition> splitPartition(Partition partition, int splitIndex) {
-//        logger.debug("Splitting partition with combination: " + partition.printElements() + " with split index: " + splitIndex);
         
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         Collection<FilterList> filters = partition.getFilters();
-//        Set<Integer> checkedRadices = new HashSet<Integer>();
-//        checkedRadices.addAll(partition.getCheckedRadices());
-//        checkedRadices.add(splitIndex);
-//        logger.info("New Checked Radices: " + Arrays.toString(checkedRadices.toArray()));
         
         int radix = partition.getRadices()[splitIndex];
         
@@ -156,7 +154,7 @@ public class SimpleProcessor implements Processor {
                     .addFilters(filterSplits[0])
                     .getPartition();
 
-            logger.info("New partition added: {}", allPartition.printElements());
+            logger.trace("New partition added: {}", allPartition.printElements());
             newPartitions.add(allPartition);
 
         } else {
@@ -171,7 +169,7 @@ public class SimpleProcessor implements Processor {
                         .addFilters(filterCollection)
                         .getPartition();
 
-                logger.info("New partition added: {}", splitPartition.printElements());
+                logger.trace("New partition added: {}", splitPartition.printElements());
                 newPartitions.add(splitPartition);
             }
         }
@@ -207,7 +205,7 @@ public class SimpleProcessor implements Processor {
         incompletePartitions = partitionExport.getIncompletePartitions();
         finalCombinations = partitionExport.getCompletePartitions();
         
-        this.conformPartition();
+        incompletePartitions = this.computeConformedPartition(incompletePartitions);
     }
 
     @Override
@@ -223,7 +221,7 @@ public class SimpleProcessor implements Processor {
         incompletePartitions = partitions;
         finalCombinations = new ArrayList<ElementList>();
         
-        this.conformPartition();
+        incompletePartitions = this.computeConformedPartition(incompletePartitions);
     }
 
     @Override
@@ -243,13 +241,13 @@ public class SimpleProcessor implements Processor {
     3) For all UNSET elements, add the radix to the uncheckedRadicesMap
     
     */
-    private void conformPartition() {
+    protected Collection<Partition> computeConformedPartition(Collection<Partition> nonConformedPartitions) {
         
-        logger.info("Conforming partitions.");
+        logger.trace("Conforming partitions.");
         
         Collection<Partition> conformedPartitions = new ArrayList<Partition>();
         
-        Iterator<Partition> partitionIt = incompletePartitions.iterator();
+        Iterator<Partition> partitionIt = nonConformedPartitions.iterator();
         partitionLoop:
         while(partitionIt.hasNext()) {
             Partition partition = partitionIt.next();
@@ -322,14 +320,15 @@ public class SimpleProcessor implements Processor {
             conformedPartitions.add(conformedPartition);
         }
         
-        incompletePartitions = conformedPartitions;
         
-        for(Partition partition: incompletePartitions) {
-            logger.info("Conformed partition: {}", partition.printElements());
+        for(Partition partition: conformedPartitions) {
+            logger.trace("Conformed partition: {}", partition.printElements());
             
             SortedSet<Integer> uncheckedRadicesSet = this.buildUncheckedRadicesSet(partition);
             uncheckedRadicesMap.put(partition.getElements(), uncheckedRadicesSet);
-        }   
+        }
+        
+        return conformedPartitions;
     } 
     
     private SortedSet<Integer> buildUncheckedRadicesSet(Partition partition) {

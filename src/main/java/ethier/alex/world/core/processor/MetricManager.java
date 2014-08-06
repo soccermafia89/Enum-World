@@ -63,12 +63,13 @@ public class MetricManager {
         int numSets = metrics.size();
         long maxMemory = Runtime.getRuntime().maxMemory();
 
-        long averageMemoryUsagePercent = 0L;
+        double averageMemoryUsagePercent = 0L;
         long averageQueuedPartitions = 0L;
         long totalCompletedPartitions = 0L;
         long averageIncompletedPartitions = 0L;
         long totalTime = 0L;
         double averageTime;
+        int processedPartitionsPerSecond;
 
         for (Metric metric : metrics) {
             averageMemoryUsagePercent += (1.0 * metric.usedMemory) / (1.0 * maxMemory);
@@ -81,20 +82,27 @@ public class MetricManager {
             totalTime += metric.time;
         }
 
-        averageMemoryUsagePercent = (averageMemoryUsagePercent / numSets);
+        averageMemoryUsagePercent = (averageMemoryUsagePercent / (1.0 * numSets));
         averageQueuedPartitions = (averageQueuedPartitions / numSets);
         averageIncompletedPartitions = (averageIncompletedPartitions / numSets);
         averageTime = (totalTime / numSets);
+        if(totalTime == 0) {
+            processedPartitionsPerSecond = Integer.MAX_VALUE;
+        } else {
+            processedPartitionsPerSecond = (int) (1000 * averageQueuedPartitions / totalTime);
+        }
+        
 
         StringBuilder statisticsOutput = new StringBuilder();
         statisticsOutput.append("\n");
-        statisticsOutput.append("Num Sets: \t\t\t").append(numSets).append("\n");
+        statisticsOutput.append("Num Sets: \t\t\t\t").append(numSets).append("\n");
         statisticsOutput.append("Avg. Memory Usage Percent: \t\t").append(averageMemoryUsagePercent).append("\n");
         statisticsOutput.append("Avg. Queued Incomplete Partitions: \t").append(averageQueuedPartitions).append("\n");
-        statisticsOutput.append("Total Completed Partitions: \t").append(totalCompletedPartitions).append("\n");
-        statisticsOutput.append("Avg. Incompleted Partitions: \t").append(averageIncompletedPartitions).append("\n");
-        statisticsOutput.append("Total Time: \t\t\t").append(totalTime).append(" milliseconds.").append("\n");
-        statisticsOutput.append("Avg. Time: \t\t\t").append(averageTime).append(" milliseconds.").append("\n");
+        statisticsOutput.append("Total Completed Partitions: \t\t").append(totalCompletedPartitions).append("\n");
+        statisticsOutput.append("Avg. Incompleted Partitions: \t\t").append(averageIncompletedPartitions).append("\n");
+        statisticsOutput.append("Total Time: \t\t\t\t").append(totalTime).append(" milliseconds.").append("\n");
+        statisticsOutput.append("Avg. Time: \t\t\t\t").append(averageTime).append(" milliseconds.").append("\n");
+        statisticsOutput.append("Avg. Partitions/sec: \t\t\t").append(processedPartitionsPerSecond).append("\n");
         
         return statisticsOutput.toString();
     }

@@ -56,7 +56,7 @@ public class MetricsProcessor implements Processor {
         gatherStatistics();
 
         
-        logger.info("Set finished with: {} partitions left.", processor.getIncompletePartitions().size());
+        logger.trace("Set finished with: {} partitions left.", processor.getIncompletePartitions().size());
         
     }
 

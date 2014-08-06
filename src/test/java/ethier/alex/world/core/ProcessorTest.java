@@ -8,6 +8,7 @@ import com.google.common.base.Stopwatch;
 import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
+import ethier.alex.world.core.processor.DeepProcessor;
 import ethier.alex.world.core.processor.MetricsProcessor;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import ethier.alex.world.query.SimpleQuery;
@@ -33,9 +34,9 @@ import org.junit.Test;
 
  @author alex
  */
-public class SimpleProcessorTest {
+public class ProcessorTest {
     
-    private static Logger logger = LogManager.getLogger(SimpleProcessorTest.class);
+    private static Logger logger = LogManager.getLogger(ProcessorTest.class);
     
     @BeforeClass
     public static void setUpClass() {
@@ -91,7 +92,7 @@ public class SimpleProcessorTest {
         processor.setPartition(rootPartition);
         
         processor.runAll();
-        processor.printFullMetrics();
+        processor.printAggregateMetrics();
         
         Collection<ElementList> finalElements = processor.getCompletedPartitions();
         for(ElementList finalElement : finalElements) {
@@ -155,7 +156,6 @@ public class SimpleProcessorTest {
             Configuration config = ctx.getConfiguration();
             LoggerConfig loggerConfig = config.getLoggerConfig("ethier.alex");
 //            loggerConfig.setLevel(Level.ERROR);
-            loggerConfig.setLevel(Level.ERROR);
             ctx.updateLoggers();  // This causes all Loggers to refetch information
 
             //This is testing the complement done by creating an arbitrary set of allowed combinations
@@ -166,8 +166,8 @@ public class SimpleProcessorTest {
 
 //            int ones = 10;
 //            int worldLength = 20;
-            int ones = 8;
-            int worldLength = 16;
+            int ones = 9;
+            int worldLength = 18;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
@@ -204,7 +204,8 @@ public class SimpleProcessorTest {
                     .addFilters(filters)
                     .getPartition();
 
-            MetricsProcessor processor = new MetricsProcessor(new SimpleProcessor());
+            MetricsProcessor processor = new MetricsProcessor(new DeepProcessor());
+//            MetricsProcessor processor = new MetricsProcessor(new SimpleProcessor());
             processor.setPartition(rootPartition);
             Stopwatch stopWatch =  Stopwatch.createStarted();
             processor.runAll();
@@ -213,6 +214,15 @@ public class SimpleProcessorTest {
 
             int secondsRun = (int) stopWatch.elapsed(TimeUnit.SECONDS);
             logger.info("Complements found in {} seconds", secondsRun);
+            
+            Collection<ElementList> combinations = processor.getCompletedPartitions();
+
+            for(ElementList combination : combinations) {
+                
+                String enumStr = combination.toString();
+                int numOnes = StringUtils.countMatches(enumStr, "1");
+                Assert.assertTrue(numOnes != ones);                
+            }
     }
     
     @Test
@@ -235,7 +245,7 @@ public class SimpleProcessorTest {
 //            int ones = 10;
 //            int worldLength = 20;
             int ones = 4;
-            int worldLength = 8;
+            int worldLength = 12;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];

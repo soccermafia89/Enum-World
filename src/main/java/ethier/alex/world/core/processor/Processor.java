@@ -21,10 +21,10 @@ public interface Processor {
     // Return list of incomplete partitions.
     public Collection<Partition> getIncompletePartitions();
     
-    // Import a set of partitions created by the exportPartitions method.
+    // Import a set of partitions created by the exportPartitions method.  Wipe existing state.
     public void importPartitions(PartitionExport partitionExport);
     
-    // Return all complete and incomplete partitions.
+    // Return all complete and incomplete partitions, and then wipe current state.
     public PartitionExport reset();
     
     // Add a collection of partitions to process.
