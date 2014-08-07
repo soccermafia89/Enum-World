@@ -1,6 +1,7 @@
 package ethier.alex.world.app.test;
 
 import ethier.alex.world.addon.FilterListBuilder;
+import ethier.alex.world.core.TestUtils;
 import ethier.alex.world.core.data.ElementList;
 import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
@@ -94,7 +95,6 @@ public class ResistanceTest {
         round3Players.add("raj");
         game.playRound(round3Players, 0);
 
-//        game.assumeResistance("john");
 
         Partition gamePartition = game.createRootPartition();
 
@@ -134,7 +134,7 @@ public class ResistanceTest {
         System.out.println("");
         System.out.println("");
         
-//        this.setLogLevel(Level.TRACE);
+        TestUtils.setLogLevel(Level.TRACE);
 
         List<String> players = new ArrayList<String>();
         players.add("alex");
@@ -147,38 +147,36 @@ public class ResistanceTest {
 
         Game game = new Game(players, 2, rounds);
 
-        Set<String> round0Players = new HashSet<String>();
-        round0Players.add("alex");
-        round0Players.add("john");
-        game.playRound(round0Players, 0);
-
-        Set<String> round1Players = new HashSet<String>();
-        round1Players.add("jeanie");
-        round1Players.add("liban");
-        round1Players.add("liz");
-        game.playRound(round1Players, 1);
-
-        game.applyVoteVouch("john", "liban", 2);
-        game.applyVoteAccusation("alex", "liban", 2);
-
-        Set<String> round2Players = new HashSet<String>();
-        round2Players.add("john");
-        round2Players.add("liban");
-        game.playRound(round2Players, 0);
-
-        Set<String> round3Players = new HashSet<String>();
-        round3Players.add("john");
-        round3Players.add("liban");
-        round3Players.add("jeanie");
-        game.playRound(round3Players, 1);
-
-        game.applyVoteAccusation("jeanie", "john", 3);
-        game.applyAccustion("liban", "jeanie");
-        game.applyVouch("liban", "john");
-        game.applyAccustion("alex", "jeanie");
-        game.applyVouch("john", "liz");
-
-//        game.assumeResistance("john");
+//        Set<String> round0Players = new HashSet<String>();
+//        round0Players.add("alex");
+//        round0Players.add("john");
+//        game.playRound(round0Players, 0);
+//
+//        Set<String> round1Players = new HashSet<String>();
+//        round1Players.add("jeanie");
+//        round1Players.add("liban");
+//        round1Players.add("liz");
+//        game.playRound(round1Players, 1);
+//
+//        game.applyVoteVouch("john", "liban", 2);
+//        game.applyVoteAccusation("alex", "liban", 2);
+//
+//        Set<String> round2Players = new HashSet<String>();
+//        round2Players.add("john");
+//        round2Players.add("liban");
+//        game.playRound(round2Players, 0);
+//
+//        Set<String> round3Players = new HashSet<String>();
+//        round3Players.add("john");
+//        round3Players.add("liban");
+//        round3Players.add("jeanie");
+//        game.playRound(round3Players, 1);
+//
+//        game.applyVoteAccusation("jeanie", "john", 3);
+//        game.applyAccustion("liban", "jeanie");
+//        game.applyVouch("liban", "john");
+//        game.applyAccustion("alex", "jeanie");
+//        game.applyVouch("john", "liz");
 
         Partition gamePartition = game.createRootPartition();
 
@@ -280,14 +278,5 @@ public class ResistanceTest {
         }
 
         logger.info("World Size: " + wizard.getWorldSize());
-    }
-    
-    private void setLogLevel(Level level) {
-        //Since logging significantly effects performance metrics, raise the level.
-        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-        Configuration config = ctx.getConfiguration();
-        LoggerConfig loggerConfig = config.getLoggerConfig("ethier.alex");
-            loggerConfig.setLevel(level);
-        ctx.updateLoggers();  // This causes all Loggers to refetch information
     }
 }

@@ -49,25 +49,25 @@ public class Partition implements Writable {
         return elements;
     }
     
-    public ElementList[] getSplits(int splitOffset) {
-        
-        int radix = radices[splitOffset];
-        
-        ElementList[] elementSplits = new ElementList[radix];
-        
-        for(int i=0;i < radix;i++) {
-            Element newElement = new Element(i);
-            
-            ElementList newSplit = ElementListBuilder.newInstance()
-                    .copy(elements)
-                    .setElement(splitOffset, newElement)
-                    .getElementList();
-                        
-            elementSplits[i] = newSplit;            
-        }
-        
-        return elementSplits;
-    }
+//    public ElementList[] getSplits(int splitOffset) {
+//        
+//        int radix = radices[splitOffset];
+//        
+//        ElementList[] elementSplits = new ElementList[radix];
+//        
+//        for(int i=0;i < radix;i++) {
+//            Element newElement = new Element(i);
+//            
+//            ElementList newSplit = ElementListBuilder.newInstance()
+//                    .copy(elements)
+//                    .setElement(splitOffset, newElement)
+//                    .getElementList();
+//                        
+//            elementSplits[i] = newSplit;            
+//        }
+//        
+//        return elementSplits;
+//    }
 
     public String printElements() {
         StringBuilder stringBuilder = new StringBuilder();

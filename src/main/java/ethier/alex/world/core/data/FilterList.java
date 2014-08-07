@@ -21,14 +21,34 @@ public class FilterList implements Writable {
 
     private static Logger logger = LogManager.getLogger(FilterList.class);
     private Filter[] filters;
+    private int checkCount;
     
     public FilterList(DataInput in) throws IOException {
         this.readFields(in);
     }
+    
+    public FilterList(Filter[] myFilterElements, int myCheckCount) {
+        filters = myFilterElements;
+        checkCount = myCheckCount;
+    }
 
     public FilterList(Filter[] myFilterElements) {
-
         filters = myFilterElements;
+        
+        checkCount = 0;
+        for(Filter filter : myFilterElements) {
+            if(filter.getFilterState() == FilterState.ONE) {
+                checkCount++;
+            }
+        }
+    }
+    
+    public void registerCheck() {
+        checkCount--;
+    }
+    
+    public int getCheckCount() {
+        return checkCount;
     }
 
     public int getLength() {
@@ -183,14 +203,24 @@ public class FilterList implements Writable {
     
     @Override
     public void write(DataOutput out) throws IOException {
+        this.writeCheckCount(out);
         this.writeWorldSize(out);
         this.writeFilters(out);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
+        this.readCheckCount(in);
         this.readWorldSize(in);
         filters = this.readFilters(in).filters;
+    }
+    
+    private void writeCheckCount(DataOutput out) throws IOException {
+        out.writeInt(checkCount);
+    }
+    
+    private void readCheckCount(DataInput in) throws IOException {
+        checkCount = in.readInt();
     }
     
     private void writeWorldSize(DataOutput out) throws IOException {

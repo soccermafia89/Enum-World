@@ -4,7 +4,10 @@
  */
 package ethier.alex.world.core.processor;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import ethier.alex.world.addon.ElementListBuilder;
+import ethier.alex.world.addon.FilterListBuilder;
 import ethier.alex.world.addon.PartitionBuilder;
 import ethier.alex.world.core.data.*;
 import java.util.*;
@@ -44,8 +47,14 @@ public class SimpleProcessor implements Processor {
     
     @Override
     public void runAll() {
+        int tmpCount = 0;
         while(!incompletePartitions.isEmpty()) {
             this.runSet();
+//            break;
+            tmpCount++;
+            if(tmpCount > 5) {
+                break;
+            }
         }
     }
     
@@ -105,46 +114,56 @@ public class SimpleProcessor implements Processor {
         }
         
         return elementsCopy.getElementList();
-    } 
-    
+    }
+
     private Collection<Partition> splitPartition(Partition partition, int splitIndex) {
-        
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         Collection<FilterList> filters = partition.getFilters();
+        ElementList elements = partition.getElements();
         
         int radix = partition.getRadices()[splitIndex];
         
-        Collection<FilterList>[] filterSplits = new Collection[radix];
-        for(int i=0; i < filterSplits.length;i++) {
-            filterSplits[i] = new ArrayList<FilterList>();
-        }
-
-        boolean allBothFilters = true;
+        Collection<FilterList> allFilters = new ArrayList<FilterList>();
+//        Set<Integer> filterOrdinals = new HashSet<Integer>();
+        Multimap<Integer, FilterList> filterMap = HashMultimap.create();
+        
         for(FilterList filter : filters) {
+            
             Filter filterElement = filter.getFilter(splitIndex);
             
+            // TODO check checkcount after registering!
             if(filterElement.getFilterState() == FilterState.ALL) {
+                allFilters.add(filter);
+            } else {
                 
-                for(Collection<FilterList> filterSplit : filterSplits) {
-                    filterSplit.add(filter);
+                if(filter.getCheckCount() == 1) {
+                    int filterOrdinal = filterElement.getOrdinal();
+                    int elementOrdinal = elements.getOrdinals()[splitIndex];
+                    if(filterOrdinal == elementOrdinal) {
+                        logger.info("PREMATCH FOUND");
+                        return newPartitions;
+                    }
                 }
                 
-            } else if(filterElement.getFilterState() == FilterState.ONE) {
                 int ordinal = filterElement.getOrdinal();
-                filterSplits[ordinal].add(filter);
                 
-                allBothFilters = false;
-            } else {
-                throw new RuntimeException("Invalid state, filterBit: {} should have correct FilterElementState." + filterElement);
+                FilterList newFilter = FilterListBuilder.newInstance()
+                        .copy(filter)
+                        .getFilterList();
+                
+//                logger.info("Check count: " + newFilter.getCheckCount() + " for " + newFilter);
+                newFilter.registerCheck();
+//                logger.info("New Check count: " + newFilter.getCheckCount() + " for " + newFilter);
+                
+                filterMap.put(ordinal, newFilter);
             }
         }
-
+        
+        
         // In the special case that all filters contain a '*' then we don't need to return multiple splits.
         // This is the key to computing quickly.
-        if(allBothFilters) {
-            
+        if(filterMap.keySet().isEmpty()) {
             Element allElement = new Element(ElementState.ALL);
-            ElementList elements = partition.getElements();
             ElementList elementsCopy = ElementListBuilder.newInstance()
                     .copy(elements)
                     .setElement(splitIndex, allElement)
@@ -153,38 +172,121 @@ public class SimpleProcessor implements Processor {
             Partition allPartition = PartitionBuilder.newInstance()
                     .setElements(elementsCopy)
                     .setRadices(partition.getRadices())
-                    .addFilters(filterSplits[0])
+                    .addFilters(filters)
                     .getPartition();
 
             logger.trace("New partition added: {}", allPartition.printElements());
             newPartitions.add(allPartition);
-
         } else {
-            ElementList[] combinationSplits = partition.getSplits(splitIndex);
+            // Otherwise create a new set of partitions containing only the filters that apply to them.
             
-            for(int i=0;i < filterSplits.length;i++) {
-                Collection<FilterList> filterCollection = filterSplits[i];
-                ElementList splitCombination = combinationSplits[i];
+            for(int ordinal=0; ordinal<radix;ordinal++) {                
+//                if(!filterOrdinals.contains(ordinal)) {
+                    
+                Collection<FilterList> ordinalFilters = filterMap.get(ordinal);
+
+                Element newElement = new Element(ordinal);
+
+                ElementList newSplit = ElementListBuilder.newInstance()
+                        .copy(elements)
+                        .setElement(splitIndex, newElement)
+                        .getElementList();
+
                 Partition splitPartition = PartitionBuilder.newInstance()
+                        .setElements(newSplit)
                         .setRadices(partition.getRadices())
-                        .setElements(splitCombination)
-                        .addFilters(filterCollection)
+                        .addFilters(allFilters)
+                        .addFilters(ordinalFilters)
                         .getPartition();
-                
-                // Rather than continuing to split partitions, we should check to see if any filters already match
-                // This way we can remove partitions early.
-                if(!matchExists(splitPartition, uncheckedRadicesMap.get(partition.getElements()))) {
-                    logger.trace("New partition added: {}", splitPartition.printElements());
-                    newPartitions.add(splitPartition);
-                } 
-//                else {
-//                    logger.info("Match pre-filtered: {}", splitPartition.printElements());
+
+//                    logger.trace("");
+                logger.trace("New partition added: {}", splitPartition.printElements());
+                for(FilterList filter : splitPartition.getFilters()) {
+                    logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
+                }
+                newPartitions.add(splitPartition);
 //                }
             }
         }
-
+        
         return newPartitions;
     }
+    
+//    private Collection<Partition> splitPartition(Partition partition, int splitIndex) {
+//        
+//        Collection<Partition> newPartitions = new ArrayList<Partition>();
+//        Collection<FilterList> filters = partition.getFilters();
+//        
+//        int radix = partition.getRadices()[splitIndex];
+//        
+//        Collection<FilterList>[] filterSplits = new Collection[radix];
+//        for(int i=0; i < filterSplits.length;i++) {
+//            filterSplits[i] = new ArrayList<FilterList>();
+//        }
+//
+//        boolean allBothFilters = true;
+//        for(FilterList filter : filters) {
+//            Filter filterElement = filter.getFilter(splitIndex);
+//            
+//            if(filterElement.getFilterState() == FilterState.ALL) {
+//                
+//                for(Collection<FilterList> filterSplit : filterSplits) {
+//                    filterSplit.add(filter);
+//                }
+//                
+//            } else if(filterElement.getFilterState() == FilterState.ONE) {
+//                int ordinal = filterElement.getOrdinal();
+//                filterSplits[ordinal].add(filter);
+//                
+//                allBothFilters = false;
+//            } else {
+//                throw new RuntimeException("Invalid state, filterBit: {} should have correct FilterElementState." + filterElement);
+//            }
+//        }
+//
+//        // In the special case that all filters contain a '*' then we don't need to return multiple splits.
+//        // This is the key to computing quickly.
+//        if(allBothFilters) {
+//            
+//            Element allElement = new Element(ElementState.ALL);
+//            ElementList elements = partition.getElements();
+//            ElementList elementsCopy = ElementListBuilder.newInstance()
+//                    .copy(elements)
+//                    .setElement(splitIndex, allElement)
+//                    .getElementList();
+//                        
+//            Partition allPartition = PartitionBuilder.newInstance()
+//                    .setElements(elementsCopy)
+//                    .setRadices(partition.getRadices())
+//                    .addFilters(filterSplits[0])
+//                    .getPartition();
+//
+//            logger.trace("New partition added: {}", allPartition.printElements());
+//            newPartitions.add(allPartition);
+//
+//        } else {
+//            ElementList[] combinationSplits = partition.getSplits(splitIndex);
+//            
+//            for(int i=0;i < filterSplits.length;i++) {
+//                Collection<FilterList> filterCollection = filterSplits[i];
+//                ElementList splitCombination = combinationSplits[i];
+//                Partition splitPartition = PartitionBuilder.newInstance()
+//                        .setRadices(partition.getRadices())
+//                        .setElements(splitCombination)
+//                        .addFilters(filterCollection)
+//                        .getPartition();
+//                
+//                // Rather than continuing to split partitions, we should check to see if any filters already match
+//                // This way we can remove partitions early.
+//                if(!matchExists(splitPartition, uncheckedRadicesMap.get(partition.getElements()))) {
+//                    logger.trace("New partition added: {}", splitPartition.printElements());
+//                    newPartitions.add(splitPartition);
+//                } 
+//            }
+//        }
+//
+//        return newPartitions;
+//    }
     
     // TODO: Create a new uncheckedRadicesMap that uses both the elementList and Filter list as the key
     // This will prevent duplicate checks.

@@ -234,6 +234,8 @@ public class ProcessorTest {
             System.out.println("********************************************");
             System.out.println("");
             System.out.println("");
+            
+//            TestUtils.setLogLevel(Level.TRACE);
 
             //This is testing the complement done by creating an arbitrary set of allowed combinations
             //Then creating filters out of them, applying and getting the new set of combinations (which is the complement)

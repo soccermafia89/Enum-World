@@ -20,12 +20,26 @@ public class FilterListBuilder {
     private int[] ordinals;
     private FilterState[] filterStates;
     private int worldLength;
+    private int checkCount = -1;
 
     public static FilterListBuilder newInstance() {
         return new FilterListBuilder();
     }
 
     public FilterListBuilder() {
+    }
+    
+    public FilterListBuilder copy(FilterList filter) {
+        if (filterArray != null) {
+            throw new RuntimeException("NumeralArray already created.");
+        }
+        
+        ordinals = filter.getOrdinals();
+        filterStates = filter.getFilterStates();
+        worldLength = filter.getFilterStates().length;
+        checkCount = filter.getCheckCount();
+        
+        return this;
     }
 
     public FilterListBuilder setQuick(String inputStr) {
@@ -113,6 +127,15 @@ public class FilterListBuilder {
         filterStates = states;
         return this;
     }
+    
+    public FilterListBuilder setCheckCount(int myCheckCount) {
+        if (filterArray != null) {
+            throw new RuntimeException("NumeralArray already created.");
+        }
+        
+        checkCount = myCheckCount;
+        return this;
+    }
 
     public FilterList getFilterList() {
         if (filterArray == null) {
@@ -144,8 +167,11 @@ public class FilterListBuilder {
                 }
             }
 
-
-            filterArray = new FilterList(newFilterElements);
+            if(checkCount > -1) {
+                filterArray = new FilterList(newFilterElements, checkCount);
+            } else {
+                filterArray = new FilterList(newFilterElements);
+            }
         }
 
         return filterArray;
