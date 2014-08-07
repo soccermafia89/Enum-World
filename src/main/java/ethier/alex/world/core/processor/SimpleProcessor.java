@@ -47,15 +47,18 @@ public class SimpleProcessor implements Processor {
     
     @Override
     public void runAll() {
-        int tmpCount = 0;
+        logger.info("Running processor.");
+//        int tmpCount = 0;
         while(!incompletePartitions.isEmpty()) {
             this.runSet();
 //            break;
-            tmpCount++;
-            if(tmpCount > 5) {
-                break;
-            }
+//            tmpCount++;
+//            if(tmpCount > 5) {
+//                break;
+//            }
         }
+        
+        logger.info("Finished computing.");
     }
     
     @Override
@@ -85,6 +88,8 @@ public class SimpleProcessor implements Processor {
         SortedSet<Integer> uncheckedRadices = uncheckedRadicesMap.get(partition.getElements());
         Collection<Partition> splitPartitions = new ArrayList<Partition>();       
         
+        // TODO: re-evaluate the usage of unchecked radices.  Is it necessary?
+        // What is proper behavior when the uncheckedRadices is empty?
         if(!uncheckedRadices.isEmpty()) {
             int uncheckedRadix = uncheckedRadices.first();
             splitPartitions = this.splitPartition(partition, uncheckedRadix);
@@ -95,7 +100,10 @@ public class SimpleProcessor implements Processor {
             for(Partition splitPartition : splitPartitions) {
                 uncheckedRadicesMap.put(splitPartition.getElements(), newUncheckedRadices);
             }
-        }
+        } 
+//        else {
+//            logger.info("Unchecked radices is empty for partition: {}", partition.getElements());
+//        }
         uncheckedRadicesMap.remove(partition.getElements());
         return splitPartitions;
     }
@@ -117,6 +125,7 @@ public class SimpleProcessor implements Processor {
     }
 
     private Collection<Partition> splitPartition(Partition partition, int splitIndex) {
+        logger.trace("Splitting partition: {}", partition.getElements());
         Collection<Partition> newPartitions = new ArrayList<Partition>();
         Collection<FilterList> filters = partition.getFilters();
         ElementList elements = partition.getElements();
@@ -124,7 +133,7 @@ public class SimpleProcessor implements Processor {
         int radix = partition.getRadices()[splitIndex];
         
         Collection<FilterList> allFilters = new ArrayList<FilterList>();
-//        Set<Integer> filterOrdinals = new HashSet<Integer>();
+        Set<Integer> filterOrdinals = new HashSet<Integer>();
         Multimap<Integer, FilterList> filterMap = HashMultimap.create();
         
         for(FilterList filter : filters) {
@@ -136,33 +145,26 @@ public class SimpleProcessor implements Processor {
                 allFilters.add(filter);
             } else {
                 
-                if(filter.getCheckCount() == 1) {
-                    int filterOrdinal = filterElement.getOrdinal();
-                    int elementOrdinal = elements.getOrdinals()[splitIndex];
-                    if(filterOrdinal == elementOrdinal) {
-                        logger.info("PREMATCH FOUND");
-                        return newPartitions;
-                    }
+                int filterOrdinal = filterElement.getOrdinal();
+                
+                if(filter.getCheckCount() == 1) {                    
+                    filterOrdinals.add(filterOrdinal);
+                } else {
+                    
+                    FilterList newFilter = FilterListBuilder.newInstance()
+                            .copy(filter)
+                            .getFilterList();
+
+                    newFilter.registerCheck();
+                    filterMap.put(filterOrdinal, newFilter);
                 }
-                
-                int ordinal = filterElement.getOrdinal();
-                
-                FilterList newFilter = FilterListBuilder.newInstance()
-                        .copy(filter)
-                        .getFilterList();
-                
-//                logger.info("Check count: " + newFilter.getCheckCount() + " for " + newFilter);
-                newFilter.registerCheck();
-//                logger.info("New Check count: " + newFilter.getCheckCount() + " for " + newFilter);
-                
-                filterMap.put(ordinal, newFilter);
             }
         }
         
         
         // In the special case that all filters contain a '*' then we don't need to return multiple splits.
         // This is the key to computing quickly.
-        if(filterMap.keySet().isEmpty()) {
+        if(filterMap.keySet().isEmpty() && filterOrdinals.isEmpty()) {
             Element allElement = new Element(ElementState.ALL);
             ElementList elementsCopy = ElementListBuilder.newInstance()
                     .copy(elements)
@@ -176,36 +178,38 @@ public class SimpleProcessor implements Processor {
                     .getPartition();
 
             logger.trace("New partition added: {}", allPartition.printElements());
+//            for(FilterList filter : allPartition.getFilters()) {
+//                logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
+//            }
             newPartitions.add(allPartition);
         } else {
             // Otherwise create a new set of partitions containing only the filters that apply to them.
             
             for(int ordinal=0; ordinal<radix;ordinal++) {                
-//                if(!filterOrdinals.contains(ordinal)) {
+                if(!filterOrdinals.contains(ordinal)) {
                     
-                Collection<FilterList> ordinalFilters = filterMap.get(ordinal);
+                    Collection<FilterList> ordinalFilters = filterMap.get(ordinal);
 
-                Element newElement = new Element(ordinal);
+                    Element newElement = new Element(ordinal);
 
-                ElementList newSplit = ElementListBuilder.newInstance()
-                        .copy(elements)
-                        .setElement(splitIndex, newElement)
-                        .getElementList();
+                    ElementList newSplit = ElementListBuilder.newInstance()
+                            .copy(elements)
+                            .setElement(splitIndex, newElement)
+                            .getElementList();
 
-                Partition splitPartition = PartitionBuilder.newInstance()
-                        .setElements(newSplit)
-                        .setRadices(partition.getRadices())
-                        .addFilters(allFilters)
-                        .addFilters(ordinalFilters)
-                        .getPartition();
+                    Partition splitPartition = PartitionBuilder.newInstance()
+                            .setElements(newSplit)
+                            .setRadices(partition.getRadices())
+                            .addFilters(allFilters)
+                            .addFilters(ordinalFilters)
+                            .getPartition();
 
-//                    logger.trace("");
-                logger.trace("New partition added: {}", splitPartition.printElements());
-                for(FilterList filter : splitPartition.getFilters()) {
-                    logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
+                    logger.trace("New partition added: {}", splitPartition.printElements());
+//                    for(FilterList filter : splitPartition.getFilters()) {
+//                        logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
+//                    }
+                    newPartitions.add(splitPartition);
                 }
-                newPartitions.add(splitPartition);
-//                }
             }
         }
         
