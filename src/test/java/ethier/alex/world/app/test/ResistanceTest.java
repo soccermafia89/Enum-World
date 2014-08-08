@@ -245,7 +245,7 @@ public class ResistanceTest {
 
         MetricsProcessor processor = new MetricsProcessor(new SimpleProcessor());
         processor.setPartition(gamePartition);
-//        simpleProcessor.setPartition(gamePartition);
+
         processor.runAll();
         Collection<ElementList> elements = processor.getCompletedPartitions();
 //        for (ElementList element : elements) {
