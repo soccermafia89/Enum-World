@@ -244,8 +244,8 @@ public class ProcessorTest {
 
 //            int ones = 10;
 //            int worldLength = 20;
-            int ones = 4;
-            int worldLength = 12;
+            int ones = 8;
+            int worldLength = 16;
 
             Collection<FilterList> filters = new ArrayList<FilterList>();
             int[] radices = new int[worldLength];
