@@ -126,7 +126,7 @@ public class ProcessorTest {
         filterQueries3.add(filter1query3);
         filterQueries3.add(filter2query3);
         
-        SimpleQuery query = new SimpleQuery(radices, finalElements);
+        SimpleQuery query = new SimpleQuery(new SimpleProcessor(), radices, finalElements);
         System.out.println("World Size: " + query.getWorldSize());
         
         double queryResult1 = query.query(filter1query1);
