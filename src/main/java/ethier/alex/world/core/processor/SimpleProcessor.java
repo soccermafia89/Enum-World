@@ -177,7 +177,7 @@ public class SimpleProcessor implements Processor {
                     .addFilters(filters)
                     .getPartition();
 
-            logger.trace("New partition added: {}", allPartition.printElements());
+            logger.trace("New partition added: {}", allPartition.getElements());
 //            for(FilterList filter : allPartition.getFilters()) {
 //                logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
 //            }
@@ -204,7 +204,7 @@ public class SimpleProcessor implements Processor {
                             .addFilters(ordinalFilters)
                             .getPartition();
 
-                    logger.trace("New partition added: {}", splitPartition.printElements());
+                    logger.trace("New partition added: {}", splitPartition.getElements());
 //                    for(FilterList filter : splitPartition.getFilters()) {
 //                        logger.info("With filter: " + filter + " check count: " + filter.getCheckCount());
 //                    }
@@ -444,7 +444,7 @@ public class SimpleProcessor implements Processor {
         
         
         for(Partition partition: conformedPartitions) {
-            logger.trace("Conformed partition: {}", partition.printElements());
+            logger.trace("Conformed partition: {}", partition.getElements());
             
             SortedSet<Integer> uncheckedRadicesSet = this.buildUncheckedRadicesSet(partition);
             uncheckedRadicesMap.put(partition.getElements(), uncheckedRadicesSet);
