@@ -26,10 +26,12 @@ public class SimpleQuery implements Query {
     Collection<ElementList> elements;
     int[] radices;
     BigDecimal worldSize;
+    Processor processor;
 
-    public SimpleQuery(int[] myRadices, Collection<ElementList> myElements) {
+    public SimpleQuery(Processor myProcessor, int[] myRadices, Collection<ElementList> myElements) {
         radices = myRadices;
         elements = myElements;
+        processor = myProcessor;
         
         worldSize = this.computeWorldSize(myElements);
     }
@@ -96,7 +98,7 @@ public class SimpleQuery implements Query {
             logger.trace("Adding query partition: {}", queryPartition.printElements());
         }
         
-        Processor processor = new SimpleProcessor();
+        processor.reset();
         processor.setPartitions(partitions);
         logger.info("Running query processor.");
         processor.runAll();

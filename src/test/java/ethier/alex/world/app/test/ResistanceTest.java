@@ -5,6 +5,7 @@ import ethier.alex.world.core.data.ElementList;
 import ethier.alex.world.core.data.FilterList;
 import ethier.alex.world.core.data.Partition;
 import ethier.alex.world.core.processor.DeepProcessor;
+import ethier.alex.world.core.processor.MetricsProcessor;
 import ethier.alex.world.core.processor.Processor;
 import ethier.alex.world.core.processor.SimpleProcessor;
 import ethier.alex.world.query.SimpleQuery;
@@ -104,7 +105,7 @@ public class ResistanceTest {
         processor.runAll();
         Collection<ElementList> elements = processor.getCompletedPartitions();
 
-        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(new SimpleProcessor(), gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
@@ -182,14 +183,14 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor processor = new SimpleProcessor();
+        MetricsProcessor processor = new MetricsProcessor(new SimpleProcessor());
 //        Processor processor = new DeepProcessor();
         processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
         processor.runAll();
         Collection<ElementList> elements = processor.getCompletedPartitions();
 
-        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(new SimpleProcessor(), gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
@@ -212,6 +213,7 @@ public class ResistanceTest {
         }
 
         logger.info("World Size: " + wizard.getWorldSize());
+        processor.printAggregateMetrics();
     }
 
     @Test
@@ -246,7 +248,7 @@ public class ResistanceTest {
 
         Partition gamePartition = game.createRootPartition();
 
-        Processor processor = new SimpleProcessor();
+        MetricsProcessor processor = new MetricsProcessor(new SimpleProcessor());
         processor.setPartition(gamePartition);
 //        simpleProcessor.setPartition(gamePartition);
         processor.runAll();
@@ -256,7 +258,7 @@ public class ResistanceTest {
 //        }
 
 
-        SimpleQuery wizard = new SimpleQuery(gamePartition.getRadices(), elements);
+        SimpleQuery wizard = new SimpleQuery(new SimpleProcessor(), gamePartition.getRadices(), elements);
         for (int i = 0; i < players.size(); i++) {
             String player = players.get(i);
 
@@ -280,6 +282,8 @@ public class ResistanceTest {
         }
 
         logger.info("World Size: " + wizard.getWorldSize());
+        logger.info("Computation stats:");
+        processor.printAggregateMetrics();
     }
     
     private void setLogLevel(Level level) {
